@@ -16,3 +16,4 @@ iso/packages-smoketest.txt
 packages/*/debian/*.debhelper
 packages/*/debian/*.debhelper.log
 packages/*.ddeb
+__pycache__/
