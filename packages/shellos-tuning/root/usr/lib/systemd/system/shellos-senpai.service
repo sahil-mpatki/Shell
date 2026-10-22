@@ -1,0 +1,21 @@
+[Unit]
+Description=Pressure-driven proactive memory reclaim (TMO/Senpai)
+Documentation=https://github.com/sahil-mpatki/Shell/blob/main/docs/KERNEL.md
+ConditionControlGroupController=memory
+After=systemd-zram-setup@zram0.service
+
+[Service]
+EnvironmentFile=-/etc/default/shellos-senpai
+ExecStart=/usr/libexec/shellos/shellos-senpai $SENPAI_ARGS $SENPAI_CGROUPS
+Restart=on-failure
+Nice=10
+CPUSchedulingPolicy=batch
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/sys/fs/cgroup
+NoNewPrivileges=yes
+PrivateNetwork=yes
+MemoryDenyWriteExecute=yes
+
+[Install]
+WantedBy=multi-user.target

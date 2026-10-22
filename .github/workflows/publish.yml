@@ -1,0 +1,66 @@
+name: publish
+# Rebuild the signed apt repo on GitHub Pages whenever a package build finishes.
+on:
+  workflow_run:
+    workflows: [kernel, packages, cosmic, tools]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  SHELLOS_APT_URL: https://sahil-mpatki.github.io/Shell/apt
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check signing key
+        env:
+          KEY: ${{ secrets.SHELLOS_APT_SIGNING_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "::error::Add the SHELLOS_APT_SIGNING_KEY secret (see docs/SETUP.md)"
+            exit 1
+          fi
+      - name: Collect the latest artifacts of every build workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p new
+          for wf in kernel packages cosmic tools; do
+            id=$(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf.yml" --branch main \
+                 --status completed -L 1 --json databaseId -q '.[0].databaseId')
+            if [ -n "$id" ]; then
+              echo "$wf: run $id"
+              gh run download "$id" -R "$GITHUB_REPOSITORY" -D "new/$wf" || echo "$wf: no artifacts"
+            fi
+          done
+          find new -name '*.deb' | sort
+      - name: Import signing key
+        env:
+          KEY: ${{ secrets.SHELLOS_APT_SIGNING_KEY }}
+        run: |
+          echo "$KEY" | gpg --batch --import
+          echo "GPG_KEY_ID=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr/{print $10; exit}')" >> "$GITHUB_ENV"
+      - name: Build repository
+        run: scripts/publish-apt.sh new site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4

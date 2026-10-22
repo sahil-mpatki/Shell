@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# shellos-rollback N: make Snapper snapshot N the root filesystem.
+#
+# Debian mounts / from the @ subvolume by name, so `snapper rollback` (which
+# flips the btrfs default subvolume) doesn't apply. Instead:
+#   @           -> @rollback-<timestamp>   (kept until you delete it)
+#   snapshot N  -> new writable @
+# then the Limine menu is regenerated. Reboot to use it.
+set -euo pipefail
+
+die() { printf 'shellos-rollback: %s\n' "$*" >&2; exit 1; }
+
+[[ $EUID -eq 0 ]] || exec sudo "$0" "$@"
+[[ $# -eq 1 && $1 =~ ^[0-9]+$ ]] || die "usage: shellos-rollback SNAPSHOT_NUMBER"
+N="$1"
+
+# Works from the normal system and from a booted snapshot (overlay root).
+DEV="$(blkid -U "$(sed -n 's/.*root=UUID=\([^ ]*\).*/\1/p' /proc/cmdline)")" \
+	|| die "cannot find the root btrfs device"
+TOP="$(mktemp -d /run/shellos-top.XXXXXX)"
+trap 'umount "$TOP" 2>/dev/null; rmdir "$TOP"' EXIT
+mount -o subvolid=5 "$DEV" "$TOP"
+
+SNAP="$TOP/@snapshots/$N/snapshot"
+[[ -d $SNAP ]] || die "snapshot $N not found"
+[[ -d $TOP/@ ]] || die "no @ subvolume at the top level"
+
+stamp="$(date +%Y%m%d-%H%M%S)"
+printf 'Roll back to snapshot %s? The current root is kept as @rollback-%s. [y/N] ' "$N" "$stamp"
+read -r ok
+[[ $ok == [yY]* ]] || die "aborted"
+
+mv "$TOP/@" "$TOP/@rollback-$stamp"
+btrfs subvolume snapshot "$SNAP" "$TOP/@"
+echo "Snapshot $N is now @. Old root: @rollback-$stamp"
+echo "Delete it once you're happy: btrfs subvolume delete <top>/@rollback-$stamp"
+
+shellos-limine-update || true
+echo "Reboot to finish the rollback."

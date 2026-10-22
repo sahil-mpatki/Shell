@@ -1,0 +1,14 @@
+#!/bin/sh
+# Recompress zram pages untouched for $1 seconds (default 600) with the
+# secondary algorithm (zstd). Hot pages stay in fast lz4; cold ones shrink.
+set -eu
+age="${1:-600}"
+for dev in /sys/block/zram*; do
+	[ -w "$dev/recompress" ] || continue
+	[ "$(cat "$dev/disksize")" != 0 ] || continue
+	before="$(awk '{print $3}' "$dev/mm_stat")"
+	echo "$age" > "$dev/idle"
+	echo "type=idle" > "$dev/recompress" || true
+	after="$(awk '{print $3}' "$dev/mm_stat")"
+	echo "${dev##*/}: $((before / 1048576)) MiB -> $((after / 1048576)) MiB"
+done

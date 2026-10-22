@@ -1,0 +1,64 @@
+name: iso
+# Build the live/installer ISO from the published apt repo and attach it to a
+# release. Runs weekly and on demand (Actions -> iso -> Run workflow).
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: ISO profile
+        default: desktop
+        type: choice
+        options: [desktop, minimal]
+  schedule:
+    - cron: '17 4 * * 0'   # weekly, Sunday 04:17 UTC
+
+permissions:
+  contents: write
+
+jobs:
+  iso:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PROFILE: ${{ inputs.profile || 'desktop' }}
+      SHELLOS_APT_URL: https://sahil-mpatki.github.io/Shell/apt
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+      - name: Fetch the ShellOS archive key
+        run: curl -fsSL "$SHELLOS_APT_URL/shellos-archive.asc" -o iso/keys/shellos-archive.asc
+      - name: Build ISO in Debian trixie
+        run: |
+          docker run --rm --privileged -v "$PWD:/src" -w /src \
+            -e SHELLOS_APT_URL -e DEB_DIRS=/nonexistent debian:trixie bash -euxc '
+              apt-get update
+              apt-get install -y --no-install-recommends ca-certificates curl gpg \
+                mmdebstrap squashfs-tools xorriso apt-utils
+              install -Dm644 iso/keys/shellos-archive.asc /etc/apt/keyrings/shellos-archive.asc
+              echo "deb [signed-by=/etc/apt/keyrings/shellos-archive.asc] $SHELLOS_APT_URL trixie main" \
+                > /etc/apt/sources.list.d/shellos.list
+              apt-get update && apt-get install -y limine
+              iso/build.sh "'"$PROFILE"'"'
+          sudo chown -R "$(id -u):$(id -g)" out
+      - name: Boot test (headless VM, serial console)
+        run: |
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends qemu-system-x86 ovmf xorriso
+          # Standard GitHub runners expose KVM; let this user use it.
+          if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; fi
+          python3 vm/smoke.py out/iso/*.iso --out out/vm
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vm-smoke
+          path: out/vm/
+          retention-days: 30
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          iso=$(ls out/iso/*.iso)
+          tag="iso-$(date -u +%Y%m%d)-${{ github.run_number }}"
+          gh release create "$tag" "$iso" "$iso.sha256" \
+            --title "ShellOS $PROFILE $(date -u +%Y-%m-%d)" \
+            --notes "Live/installer ISO built from the ShellOS apt repo. Write it with: sudo dd if=$(basename "$iso") of=/dev/sdX bs=4M status=progress oflag=sync"

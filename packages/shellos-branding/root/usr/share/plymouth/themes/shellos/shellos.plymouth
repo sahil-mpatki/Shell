@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=ShellOS
+Description=ShellOS spiral, breathing while the system boots
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/shellos
+ScriptFile=/usr/share/plymouth/themes/shellos/shellos.script

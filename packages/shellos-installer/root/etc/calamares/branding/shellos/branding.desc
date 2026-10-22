@@ -1,0 +1,38 @@
+---
+componentName: shellos
+
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 900px,620px
+windowPlacement: center
+sidebar: widget
+navigation: widget
+
+strings:
+    productName:         ShellOS
+    shortProductName:    ShellOS
+    version:             1 (Trixie)
+    shortVersion:        1
+    versionedName:       ShellOS 1
+    shortVersionedName:  ShellOS 1
+    bootloaderEntryName: ShellOS
+    productUrl:          https://github.com/sahil-mpatki/Shell
+    supportUrl:          https://github.com/sahil-mpatki/Shell/issues
+    knownIssuesUrl:      https://github.com/sahil-mpatki/Shell/issues
+    releaseNotesUrl:     https://github.com/sahil-mpatki/Shell
+    donateUrl:           ""
+
+images:
+    productLogo:    "logo.png"
+    productIcon:    "logo.png"
+    productWelcome: "welcome.png"
+
+slideshow:    "show.qml"
+slideshowAPI: 2
+
+style:
+    SidebarBackground:        "#0B1416"
+    SidebarText:              "#E6F4F2"
+    SidebarTextCurrent:       "#0B1416"
+    SidebarBackgroundCurrent: "#2EC4B6"

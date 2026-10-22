@@ -1,0 +1,4 @@
+#!/bin/sh
+# Keep the ESP and Limine menu in sync with installed kernels.
+command -v shellos-limine-update >/dev/null 2>&1 || exit 0
+exec shellos-limine-update

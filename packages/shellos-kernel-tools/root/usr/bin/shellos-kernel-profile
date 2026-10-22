@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+# shellos-kernel-profile: profile the running ShellOS kernel on *this*
+# machine so CI can rebuild it with AutoFDO and then Propeller.
+#
+# The loop (see docs/KERNEL.md, "Personal PGO"):
+#   uname -r = X-shellos            -> collect an AutoFDO profile
+#   uname -r = X-shellos-afdo       -> collect a Propeller profile
+#   uname -r = X-shellos-afdo-prop  -> fully optimised; --stage to refresh
+# Commit the result into kernel/profiles/ and CI does the rest.
+#
+# Usage: shellos-kernel-profile [-d SECONDS] [-s autofdo|propeller]
+#                               [-o OUTDIR] [-r REPO] [-- WORKLOAD...]
+#   -d  how long to sample when no workload is given (default 600)
+#   -s  force a stage instead of deriving it from `uname -r`
+#   -o  output directory (default ~/shellos-kernel-profile/<timestamp>)
+#   -r  path to your ShellOS git checkout: copy profiles into
+#       kernel/profiles/ and commit them (you push)
+#   WORKLOAD  a command to profile instead of normal desktop use
+set -euo pipefail
+
+# perf -a and debug-symbol installs need root; re-exec before parsing.
+[[ $EUID -eq 0 ]] || exec sudo -E "$0" "$@"
+
+PERIOD=500009   # prime sample period, as recommended by the kernel docs
+GITHUB_REPO="sahil-mpatki/Shell"
+DURATION=600
+STAGE=""
+OUTDIR=""
+REPO=""
+
+die() { printf 'shellos-kernel-profile: %s\n' "$*" >&2; exit 1; }
+log() { printf '\033[1;36m==> %s\033[0m\n' "$*"; }
+
+while getopts "d:s:o:r:h" opt; do
+	case "$opt" in
+		d) DURATION="$OPTARG" ;;
+		s) STAGE="$OPTARG" ;;
+		o) OUTDIR="$OPTARG" ;;
+		r) REPO="$(realpath "$OPTARG")" ;;
+		*) sed -n '2,/^set -euo/p' "$0" | sed '$d; s/^# \{0,1\}//'; exit 2 ;;
+	esac
+done
+shift $((OPTIND - 1))
+
+KREL="$(uname -r)"
+[[ $KREL == *-shellos* ]] || die "running kernel $KREL is not a ShellOS kernel"
+
+if [[ -z $STAGE ]]; then
+	case "$KREL" in
+		*-shellos-afdo-prop) die "kernel is already AutoFDO+Propeller optimised; pass -s to refresh a stage" ;;
+		*-shellos-afdo)      STAGE=propeller ;;
+		*-shellos)           STAGE=autofdo ;;
+		*)                   die "can't derive stage from $KREL; pass -s" ;;
+	esac
+fi
+[[ $STAGE == autofdo || $STAGE == propeller ]] || die "unknown stage: $STAGE"
+
+# --- tools -----------------------------------------------------------------
+command -v perf >/dev/null || die "perf not found (apt install linux-perf)"
+if [[ $STAGE == autofdo ]]; then
+	PROFGEN="$(command -v llvm-profgen-19 || command -v llvm-profgen || true)"
+	[[ -z $PROFGEN && -x /usr/lib/llvm-19/bin/llvm-profgen ]] && PROFGEN=/usr/lib/llvm-19/bin/llvm-profgen
+	[[ -n $PROFGEN ]] || die "llvm-profgen not found (apt install llvm-19)"
+else
+	command -v create_llvm_prof >/dev/null \
+		|| die "create_llvm_prof not found (apt install shellos-autofdo)"
+fi
+
+# Samples are mapped back to source through the kernel's debug info.
+VMLINUX="/usr/lib/debug/lib/modules/$KREL/vmlinux"
+if [[ ! -f $VMLINUX ]]; then
+	# Too big for the Pages apt repo, so CI attaches -dbg packages to a
+	# GitHub release tagged kernel-<release>-<build>.
+	log "Fetching debug symbols for $KREL from GitHub releases"
+	url="$(curl -fsSL "https://api.github.com/repos/$GITHUB_REPO/releases?per_page=100" |
+		python3 -c '
+import json, sys
+krel = sys.argv[1]
+for rel in json.load(sys.stdin):
+    if rel["tag_name"].startswith(f"kernel-{krel}-"):
+        for a in rel["assets"]:
+            if a["name"].startswith(f"linux-image-{krel}-dbg_"):
+                print(a["browser_download_url"]); sys.exit()
+' "$KREL")" || true
+	[[ -n $url ]] || die "no debug-symbol release found for $KREL"
+	tmp="$(mktemp -d)"
+	curl -fL --progress-bar -o "$tmp/dbg.deb" "$url"
+	apt-get install -y "$tmp/dbg.deb" || die "could not install $url"
+	rm -rf "$tmp"
+fi
+[[ -f $VMLINUX ]] || die "$VMLINUX missing after installing the -dbg package"
+
+# --- sample ----------------------------------------------------------------
+# Taken-branch sampling with the LBR stack. On hybrid Alder/Raptor Lake the
+# event exists on both the P-core (cpu_core) and E-core (cpu_atom) PMUs;
+# perf opens it on each.
+EVENT="br_inst_retired.near_taken:k"
+grep -q GenuineIntel /proc/cpuinfo || die "only Intel LBR sampling is wired up"
+
+if [[ -z $OUTDIR ]]; then
+	home="$(getent passwd "${SUDO_USER:-root}" | cut -d: -f6)"
+	OUTDIR="$home/shellos-kernel-profile/$(date +%Y%m%d-%H%M%S)-$STAGE"
+fi
+mkdir -p "$OUTDIR"
+PERFDATA="$OUTDIR/perf.data"
+
+log "Stage: $STAGE   kernel: $KREL"
+if (( $# > 0 )); then
+	log "Profiling workload: $*"
+	perf record -e "$EVENT" -a -N -b -c "$PERIOD" -o "$PERFDATA" -- "$@"
+else
+	log "Sampling for ${DURATION}s. Use the machine the way you normally do:"
+	log "browse, compile, game, copy files. The profile is only as good as this."
+	perf record -e "$EVENT" -a -N -b -c "$PERIOD" -o "$PERFDATA" -- sleep "$DURATION"
+fi
+
+# --- convert ---------------------------------------------------------------
+if [[ $STAGE == autofdo ]]; then
+	log "Generating AutoFDO profile"
+	"$PROFGEN" --kernel --binary="$VMLINUX" --perfdata="$PERFDATA" -o "$OUTDIR/kernel.afdo"
+	FILES=(kernel.afdo)
+else
+	log "Generating Propeller profiles"
+	create_llvm_prof --binary="$VMLINUX" --profile="$PERFDATA" \
+		--format=propeller --propeller_output_module_name \
+		--out="$OUTDIR/propeller_cc_profile.txt" \
+		--propeller_symorder="$OUTDIR/propeller_ld_profile.txt"
+	FILES=(propeller_cc_profile.txt propeller_ld_profile.txt)
+fi
+rm -f "$PERFDATA"
+
+{
+	echo "stage=$STAGE"
+	echo "kernel=$KREL"
+	echo "cpu=$(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2- | sed 's/^ //')"
+	echo "date=$(date -Iseconds)"
+} > "$OUTDIR/profile-info.txt"
+[[ -n ${SUDO_USER:-} ]] && chown -R "$SUDO_USER:" "$OUTDIR"
+
+log "Profiles written to $OUTDIR"
+
+# --- hand off to the repo ----------------------------------------------------
+if [[ -n $REPO ]]; then
+	[[ -d $REPO/kernel/profiles ]] || die "$REPO doesn't look like a ShellOS checkout"
+	for f in "${FILES[@]}" profile-info.txt; do
+		dest="$f"
+		[[ $f == profile-info.txt ]] && dest="$STAGE-info.txt"
+		install -m644 "$OUTDIR/$f" "$REPO/kernel/profiles/$dest"
+	done
+	# Commit as the invoking user so the checkout's ownership is untouched.
+	sudo -u "${SUDO_USER:-root}" git -C "$REPO" add kernel/profiles
+	sudo -u "${SUDO_USER:-root}" git -C "$REPO" commit -m "kernel: $STAGE profile from $KREL" -- kernel/profiles
+	log "Committed. Push it and CI will build the next kernel stage."
+else
+	log "Next: copy ${FILES[*]} into kernel/profiles/ in your ShellOS repo,"
+	log "commit and push. CI rebuilds the kernel with them."
+fi

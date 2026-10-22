@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+SCHEDS = scx_lavd scx_bpfland scx_flash scx_cosmos scx_rusty
+export CARGO_HOME = $(CURDIR)/debian/cargo-home
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	cargo build --release --locked $(addprefix -p ,$(SCHEDS))
+
+override_dh_auto_install:
+	for s in $(SCHEDS); do \
+		install -Dm755 target/release/$$s debian/scx-scheds/usr/bin/$$s; \
+	done
+
+override_dh_auto_test:
+override_dh_auto_clean:
+	rm -rf target debian/cargo-home
+override_dh_dwz:

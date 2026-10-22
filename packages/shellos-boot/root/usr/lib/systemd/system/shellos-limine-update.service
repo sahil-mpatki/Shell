@@ -1,0 +1,7 @@
+[Unit]
+Description=Regenerate the Limine boot menu
+ConditionPathIsMountPoint=/boot/efi
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/shellos-limine-update

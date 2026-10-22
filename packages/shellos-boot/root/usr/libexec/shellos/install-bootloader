@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Install Limine on a freshly installed ShellOS system.
+# Run inside the target (the Calamares shellprocess step chroots for us).
+#   1. Snapper config for / (if the root is btrfs)
+#   2. kernels + limine.conf onto the ESP (shellos-limine-update)
+#   3. a "ShellOS" UEFI boot entry pointing at Limine
+set -euo pipefail
+
+ESP=/boot/efi
+die() { printf 'install-bootloader: %s\n' "$*" >&2; exit 1; }
+
+mountpoint -q "$ESP" || die "$ESP is not mounted"
+
+if [[ $(findmnt -no FSTYPE /) == btrfs && ! -f /etc/snapper/configs/root ]]; then
+	# Equivalent to `snapper create-config /`, minus creating .snapshots,
+	# which the installer already made as the @snapshots subvolume.
+	install -Dm640 /etc/snapper/config-templates/shellos /etc/snapper/configs/root
+	if grep -q '^SNAPPER_CONFIGS=' /etc/default/snapper 2>/dev/null; then
+		sed -i 's/^SNAPPER_CONFIGS=.*/SNAPPER_CONFIGS="root"/' /etc/default/snapper
+	else
+		echo 'SNAPPER_CONFIGS="root"' >> /etc/default/snapper
+	fi
+	chmod 750 /.snapshots
+fi
+
+shellos-limine-update
+
+if [[ -d /sys/firmware/efi ]]; then
+	if ! mountpoint -q /sys/firmware/efi/efivars; then
+		mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+	fi
+	src="$(findmnt -no SOURCE "$ESP")"
+	disk="/dev/$(lsblk -no PKNAME "$src")"
+	part="$(cat "/sys/class/block/$(basename "$src")/partition")"
+	# Replace any previous ShellOS entries rather than piling them up.
+	efibootmgr | awk '/^Boot[0-9A-F]{4}\*? ShellOS([ \t]|$)/ {print substr($1, 5, 4)}' |
+		while read -r n; do efibootmgr -q -b "$n" -B; done
+	efibootmgr -q --create --disk "$disk" --part "$part" \
+		--label ShellOS --loader '\EFI\shellos\BOOTX64.EFI'
+	echo "install-bootloader: UEFI entry created on $disk partition $part"
+else
+	echo "install-bootloader: not booted via UEFI; relying on the fallback path EFI/BOOT/BOOTX64.EFI"
+fi

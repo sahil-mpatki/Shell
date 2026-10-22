@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+include /usr/share/dpkg/buildflags.mk
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	$(CC) $(CPPFLAGS) $(CFLAGS) -Wall -Wextra -Werror $(LDFLAGS) \
+		-o shellos-senpai src/shellos-senpai.c
+
+override_dh_auto_install:
+	mkdir -p debian/shellos-tuning
+	cp -a root/. debian/shellos-tuning/
+	install -Dm755 shellos-senpai debian/shellos-tuning/usr/libexec/shellos/shellos-senpai
+
+override_dh_installsystemd:
+	dh_installsystemd shellos-senpai.service shellos-zram-recompress.timer
+
+override_dh_auto_clean:
+	rm -f shellos-senpai

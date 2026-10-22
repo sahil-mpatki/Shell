@@ -1,0 +1,29 @@
+#!/usr/bin/make -f
+PKG = debian/shellos-branding
+ART = build-art
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	python3 art/generate.py $(ART)
+	rsvg-convert -w 512  $(ART)/logo.svg          -o $(ART)/logo.png
+	rsvg-convert -w 160  $(ART)/plymouth-logo.svg -o $(ART)/plymouth-logo.png
+	rsvg-convert -w 3840 $(ART)/wallpaper.svg     -o $(ART)/wallpaper.png
+	rsvg-convert -w 1920 $(ART)/wallpaper.svg     -o $(ART)/limine-wallpaper.png
+
+override_dh_auto_install:
+	mkdir -p $(PKG)
+	cp -a root/. $(PKG)/
+	install -Dm644 $(ART)/logo.svg          $(PKG)/usr/share/shellos/logo.svg
+	install -Dm644 $(ART)/logo-mono.svg     $(PKG)/usr/share/shellos/logo-mono.svg
+	install -Dm644 $(ART)/logo.png          $(PKG)/usr/share/shellos/logo.png
+	install -Dm644 $(ART)/limine-wallpaper.png $(PKG)/usr/share/shellos/limine-wallpaper.png
+	install -Dm644 $(ART)/logo.svg          $(PKG)/usr/share/icons/hicolor/scalable/apps/shellos.svg
+	install -Dm644 $(ART)/logo.svg          $(PKG)/usr/share/pixmaps/shellos.svg
+	install -Dm644 $(ART)/plymouth-logo.png $(PKG)/usr/share/plymouth/themes/shellos/logo.png
+	install -Dm644 $(ART)/wallpaper.png     $(PKG)/usr/share/backgrounds/shellos/shellos-spiral.png
+	install -Dm644 $(ART)/wallpaper.svg     $(PKG)/usr/share/backgrounds/shellos/shellos-spiral.svg
+
+override_dh_auto_clean:
+	rm -rf $(ART)

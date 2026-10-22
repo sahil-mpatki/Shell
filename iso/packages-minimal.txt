@@ -1,0 +1,14 @@
+# "minimal" profile: no desktop. Used to boot-test the toolchain (Limine ISO
+# -> ShellOS kernel -> live-boot -> systemd) without the COSMIC packages.
+shellos-tuning
+shellos-boot
+shellos-branding
+linux-shellos
+live-boot
+live-config
+live-config-systemd
+user-setup
+locales
+zsh
+sudo
+network-manager

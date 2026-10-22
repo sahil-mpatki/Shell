@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+if [ "$1" = configure ]; then
+	# No-op (exit 0) when the ESP isn't mounted, e.g. inside the ISO build.
+	shellos-limine-update || true
+fi
+#DEBHELPER#

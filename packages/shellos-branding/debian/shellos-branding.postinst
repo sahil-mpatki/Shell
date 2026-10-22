@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+link() { # target file
+	mkdir -p "$(dirname "$2")"
+	ln -sf "$1" "$2"
+}
+if [ "$1" = configure ]; then
+	link os-release.shellos /usr/lib/os-release
+	link issue.shellos /etc/issue
+	link issue.net.shellos /etc/issue.net
+	link /usr/share/shellos/cosmic-background-all \
+		/usr/share/cosmic/com.system76.CosmicBackground/v1/all
+	if command -v plymouth-set-default-theme >/dev/null 2>&1; then
+		plymouth-set-default-theme shellos || true
+	fi
+fi
+#DEBHELPER#

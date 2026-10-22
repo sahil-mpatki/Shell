@@ -1,0 +1,15 @@
+Source: shellos-branding
+Section: misc
+Priority: optional
+Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13), python3, librsvg2-bin
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: shellos-branding
+Architecture: all
+Depends: ${misc:Depends}, base-files, plymouth, plymouth-label
+Description: ShellOS identity: os-release, artwork, boot splash, desktop defaults
+ Replaces Debian's os-release and issue files (via dpkg-divert), and ships
+ the ShellOS spiral logo, wallpaper, Plymouth theme, Limine wallpaper and
+ COSMIC defaults (dark mode, teal #2EC4B6 accent).

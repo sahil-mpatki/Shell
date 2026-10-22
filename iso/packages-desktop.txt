@@ -1,0 +1,12 @@
+# Live/installed system for the "desktop" ISO profile.
+shellos-desktop
+shellos-installer
+# live session
+live-boot
+live-config
+live-config-systemd
+user-setup
+locales
+# VM guest integration (inactive on real hardware): clipboard, resize, agent
+spice-vdagent
+qemu-guest-agent

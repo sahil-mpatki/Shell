@@ -1,0 +1,7 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: autofdo
+Source: https://github.com/google/autofdo
+
+Files: *
+Copyright: Google LLC
+License: Apache-2.0

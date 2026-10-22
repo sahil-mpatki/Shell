@@ -1,0 +1,5 @@
+#!/bin/sh
+# Launch the ShellOS installer from the live session.
+# The live user has passwordless sudo; -E keeps WAYLAND_DISPLAY and
+# XDG_RUNTIME_DIR so Calamares can draw on the user's COSMIC session.
+exec sudo -E QT_QPA_PLATFORM=wayland calamares "$@"

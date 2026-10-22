@@ -1,0 +1,3 @@
+# Commits for components outside cosmic-epoch (update deliberately).
+pop-fonts       2da23d5e76bf724c49875e8fd328e1fd5a6de80e
+pop-icon-theme  1a575a8e99b4ae629b9b16543a3a04d148632ba9

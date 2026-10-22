@@ -1,0 +1,12 @@
+PRETTY_NAME="ShellOS 1 (Trixie)"
+NAME="ShellOS"
+VERSION_ID="1"
+VERSION="1 (Trixie)"
+VERSION_CODENAME=trixie
+ID=shellos
+ID_LIKE=debian
+HOME_URL="https://github.com/sahil-mpatki/Shell"
+SUPPORT_URL="https://github.com/sahil-mpatki/Shell"
+BUG_REPORT_URL="https://github.com/sahil-mpatki/Shell/issues"
+LOGO=shellos
+ANSI_COLOR="38;2;46;196;182"

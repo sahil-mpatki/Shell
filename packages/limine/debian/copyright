@@ -1,0 +1,7 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: limine
+Source: https://github.com/limine-bootloader/limine
+
+Files: *
+Copyright: 2019-2026 Mintsuki and contributors
+License: BSD-2-Clause

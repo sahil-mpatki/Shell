@@ -1,0 +1,37 @@
+name: lint
+on:
+  push:
+  pull_request:
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: |
+          shellcheck -S warning \
+            kernel/build.sh iso/*.sh scripts/*.sh packages/*/build.sh vm/shellos-vm \
+            packages/shellos-*/root/usr/bin/* packages/shellos-*/root/usr/sbin/* \
+            packages/shellos-*/root/usr/libexec/shellos/install-bootloader \
+            packages/shellos-tuning/root/usr/libexec/shellos/zram-recompress \
+            packages/shellos-boot/root/usr/share/initramfs-tools/hooks/* \
+            packages/shellos-boot/root/usr/share/initramfs-tools/scripts/local-bottom/* \
+            packages/shellos-boot/root/etc/kernel/postinst.d/*
+
+  senpai:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: gcc -O2 -Wall -Wextra -Werror -o /dev/null packages/shellos-tuning/src/shellos-senpai.c
+      - run: python3 -m py_compile vm/smoke.py packages/shellos-branding/art/generate.py
+
+  kernel-config:
+    # Patches apply and every pinned option survives olddefconfig.
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - run: apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v4
+      - run: kernel/build.sh --install-deps
+      - run: kernel/build.sh --config-only

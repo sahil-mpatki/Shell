@@ -1,0 +1,44 @@
+# ShellOS Alacritty theme: deep sea background, teal accent.
+[window]
+padding = { x = 12, y = 10 }
+opacity = 0.96
+decorations = "Full"
+
+[font]
+size = 11.5
+normal = { family = "JetBrains Mono", style = "Regular" }
+
+[cursor]
+style = { shape = "Beam", blinking = "On" }
+
+[colors.primary]
+background = "#0B1416"
+foreground = "#E6F4F2"
+
+[colors.cursor]
+cursor = "#2EC4B6"
+text = "#0B1416"
+
+[colors.selection]
+background = "#1A4F4A"
+text = "CellForeground"
+
+[colors.normal]
+black   = "#14201F"
+red     = "#FF6B6B"
+green   = "#7BD88F"
+yellow  = "#FFD166"
+blue    = "#5AA9E6"
+magenta = "#C792EA"
+cyan    = "#2EC4B6"
+white   = "#C9D6D4"
+
+[colors.bright]
+black   = "#4A5B59"
+red     = "#FF8C8C"
+green   = "#9BE7AB"
+yellow  = "#FFE08A"
+blue    = "#86C3F0"
+magenta = "#DDB3F2"
+cyan    = "#6FE0D4"
+white   = "#F4FBFA"

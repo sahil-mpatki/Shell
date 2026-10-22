@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+# dpkg calls postrm twice on purge ("remove", then "purge"), so only act on
+# remove/abort-install, and only on diversions that are still ours.
+undivert() { # file
+	if [ "$(dpkg-divert --listpackage "$1")" = shellos-branding ]; then
+		# Only our symlink lives at the diverted path; never delete a real file.
+		[ -L "$1" ] && rm -f "$1"
+		dpkg-divert --package shellos-branding --remove --rename \
+			--divert "$1.debian" "$1"
+	fi
+}
+case "$1" in
+	remove|abort-install|disappear)
+		undivert /usr/lib/os-release
+		undivert /etc/issue
+		undivert /etc/issue.net
+		undivert /usr/share/cosmic/com.system76.CosmicBackground/v1/all
+		;;
+esac
+#DEBHELPER#

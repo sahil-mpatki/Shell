@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+# Limine's firmware stages are freestanding; distro hardening flags don't apply.
+export DEB_BUILD_MAINT_OPTIONS = hardening=-all
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- --enable-uefi-x86-64 --enable-bios --enable-bios-cd --enable-uefi-cd
+
+# The EFI/BIOS images are not ELF objects for the host; leave them alone.
+override_dh_strip:
+	dh_strip --exclude=/usr/share/limine/
+override_dh_dwz:

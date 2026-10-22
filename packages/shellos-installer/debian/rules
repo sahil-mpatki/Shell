@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+BRAND = debian/shellos-installer/etc/calamares/branding/shellos
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	mkdir -p debian/shellos-installer
+	cp -a root/. debian/shellos-installer/
+	python3 ../shellos-branding/art/generate.py build-art
+	rsvg-convert -w 256 build-art/logo.svg -o $(BRAND)/logo.png
+	rsvg-convert -w 420 build-art/logo.svg -o $(BRAND)/welcome.png
+
+override_dh_auto_clean:
+	rm -rf build-art

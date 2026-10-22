@@ -1,0 +1,16 @@
+Source: shellos-kernel-tools
+Section: admin
+Priority: optional
+Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: shellos-kernel-tools
+Architecture: all
+Depends: ${misc:Depends}, linux-perf, llvm-19, sudo, curl, python3
+Recommends: shellos-autofdo
+Description: personal profile-guided optimisation for the ShellOS kernel
+ shellos-kernel-profile samples the running kernel with Intel LBR and turns
+ the result into AutoFDO and Propeller profiles that the ShellOS kernel
+ build consumes, so the kernel is optimised for how this machine is used.

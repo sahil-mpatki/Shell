@@ -1,0 +1,36 @@
+Source: shellos-desktop
+Section: metapackages
+Priority: optional
+Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: shellos-desktop
+Architecture: all
+Depends: ${misc:Depends},
+ shellos-tuning, shellos-boot, shellos-branding, shellos-kernel-tools, linux-shellos,
+# COSMIC desktop (rebuilt for trixie by ShellOS CI)
+ cosmic-session, cosmic-greeter, cosmic-files, cosmic-settings, cosmic-store,
+ cosmic-edit, cosmic-player, xdg-desktop-portal-cosmic, xdg-desktop-portal-gtk,
+ xwayland, gnome-keyring, libpam-gnome-keyring, switcheroo-control,
+# CPU scheduler userspace
+ scx-scheds,
+# Intel Alder/Raptor Lake: microcode, GPU, Wi-Fi, audio DSP, thermals
+ intel-microcode, firmware-intel-graphics, firmware-iwlwifi, firmware-sof-signed,
+ intel-media-va-driver-non-free, mesa-vulkan-drivers, thermald,
+# Session plumbing
+ pipewire-audio, wireplumber, playerctl, network-manager, bluez,
+ power-profiles-daemon, fwupd, xdg-user-dirs, plymouth, plymouth-label, sudo,
+# Your picks: zsh, Alacritty, Firefox (Mozilla repo), Flatpak, Distrobox
+ zsh, zsh-autosuggestions, zsh-syntax-highlighting, starship, alacritty,
+ firefox, flatpak, distrobox, podman,
+# Snapshots UI
+ snapper, btrfs-assistant,
+# Fonts
+ fonts-jetbrains-mono, fonts-noto-core, fonts-noto-color-emoji
+Description: ShellOS desktop (COSMIC) and everything it ships with
+ Pulls in the ShellOS kernel, tuning and boot integration, the COSMIC
+ desktop, Intel hybrid-CPU firmware and drivers, the sched_ext LAVD
+ scheduler, and the default user environment (zsh + starship, Alacritty,
+ Firefox, Flatpak with Flathub, Distrobox).

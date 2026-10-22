@@ -1,0 +1,5 @@
+# shellos-senpai: see `shellos-senpai -h` and docs/KERNEL.md.
+# -i interval (s), -p stall target (% of wall time), -r reclaim ratio per
+# step, -m max step (MiB), -w hold while free swap is below this %.
+SENPAI_ARGS="-i 6 -p 0.1 -r 0.0005 -m 64 -w 10"
+SENPAI_CGROUPS="/sys/fs/cgroup/user.slice /sys/fs/cgroup/system.slice"

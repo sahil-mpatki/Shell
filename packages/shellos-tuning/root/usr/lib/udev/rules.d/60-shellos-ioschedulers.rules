@@ -1,0 +1,9 @@
+# Per-device I/O schedulers.
+#   NVMe:      none        (deep hardware queues; any scheduler only adds latency)
+#   SATA SSD:  mq-deadline (cheap, bounds read latency)
+#   HDD:       bfq         (fair, keeps the desktop responsive during big copies)
+ACTION!="add|change", GOTO="shellos_io_end"
+KERNEL=="nvme[0-9]*n[0-9]*", ATTR{queue/scheduler}="none", GOTO="shellos_io_end"
+KERNEL=="sd[a-z]*|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline", GOTO="shellos_io_end"
+KERNEL=="sd[a-z]*", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
+LABEL="shellos_io_end"

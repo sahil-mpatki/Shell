@@ -1,0 +1,11 @@
+# sched_ext scheduler run by shellos-scx.service.
+#
+# scx_lavd: latency-criticality-aware virtual deadline scheduler (Igalia/
+# Valve). It infers which tasks are latency-critical from their wake/wait
+# graph and has P/E-core aware "core compaction" for hybrid Intel CPUs.
+# --autopower follows the power profile chosen in COSMIC's power applet.
+#
+# If the BPF scheduler exits or errors, the kernel automatically falls back
+# to EEVDF+BORE. To use only BORE: systemctl disable --now shellos-scx
+SCX_SCHEDULER=scx_lavd
+SCX_FLAGS="--autopower"

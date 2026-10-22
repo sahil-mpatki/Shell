@@ -1,0 +1,15 @@
+Source: limine
+Section: admin
+Priority: optional
+Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13), nasm, mtools, clang, lld, llvm
+Standards-Version: 4.7.0
+Homepage: https://github.com/limine-bootloader/limine
+Rules-Requires-Root: no
+
+Package: limine
+Architecture: amd64
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: modern, advanced, portable, multiprotocol bootloader
+ Limine bootloader binaries (UEFI x86-64, BIOS, BIOS/UEFI CD) and the
+ `limine` host utility. Packaged for ShellOS from the upstream release.

@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+divert() { # file
+	dpkg-divert --package shellos-branding --add --rename \
+		--divert "$1.debian" "$1"
+}
+case "$1" in
+	install|upgrade)
+		divert /usr/lib/os-release
+		divert /etc/issue
+		divert /etc/issue.net
+		divert /usr/share/cosmic/com.system76.CosmicBackground/v1/all
+		;;
+esac
+#DEBHELPER#

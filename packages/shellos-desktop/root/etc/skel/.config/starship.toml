@@ -1,0 +1,22 @@
+# ShellOS prompt: minimal, teal accent.
+add_newline = false
+format = "$directory$git_branch$git_status$cmd_duration$character"
+
+[directory]
+style = "bold #2EC4B6"
+truncation_length = 3
+
+[git_branch]
+format = "[$branch]($style) "
+style = "#7FD8CF"
+
+[git_status]
+style = "#FFB4A2"
+
+[cmd_duration]
+format = "[$duration]($style) "
+style = "#6B7F7D"
+
+[character]
+success_symbol = "[❯](bold #2EC4B6)"
+error_symbol = "[❯](bold #FF6B6B)"

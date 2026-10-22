@@ -1,0 +1,17 @@
+# ShellOS boot settings, read by shellos-limine-update.
+# Run `sudo shellos-limine-update` after editing.
+
+SHELLOS_ESP=/boot/efi
+SHELLOS_TIMEOUT=3
+
+# Normal boot:
+#   mitigations=off        your choice: no Spectre/Meltdown-class mitigations
+#   cpuidle.governor=nap   NAP neural idle governor (falls back to TEO in safe mode)
+#   zswap.enabled=0        zram is the swap; zswap would double-compress
+#   nowatchdog             no soft/hard lockup watchdog timers
+SHELLOS_CMDLINE="quiet splash loglevel=3 rd.udev.log_level=3 mitigations=off cpuidle.governor=nap zswap.enabled=0 nowatchdog"
+
+# Safe mode: stock mitigations, TEO idle, BORE/EEVDF only (no sched_ext), verbose.
+SHELLOS_SAFE_CMDLINE="cpuidle.governor=teo zswap.enabled=0 systemd.mask=shellos-scx.service"
+
+SHELLOS_MAX_SNAPSHOTS=10

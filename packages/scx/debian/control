@@ -1,0 +1,17 @@
+Source: scx-scheds
+Section: admin
+Priority: optional
+Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13), cargo (>= 1.91), rustc (>= 1.91), clang, llvm,
+ libelf-dev, zlib1g-dev, libzstd-dev, pkg-config
+Standards-Version: 4.7.0
+Homepage: https://github.com/sched-ext/scx
+Rules-Requires-Root: no
+
+Package: scx-scheds
+Architecture: amd64
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: sched_ext BPF CPU schedulers
+ Userspace loaders for sched_ext schedulers: scx_lavd (latency-criticality
+ aware, hybrid-CPU aware), scx_bpfland (interactive), scx_flash, scx_cosmos
+ and scx_rusty. Requires a kernel with CONFIG_SCHED_CLASS_EXT.

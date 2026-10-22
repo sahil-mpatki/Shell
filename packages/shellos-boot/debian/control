@@ -1,0 +1,15 @@
+Source: shellos-boot
+Section: admin
+Priority: optional
+Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: shellos-boot
+Architecture: all
+Depends: ${misc:Depends}, limine (>= 12), efibootmgr, btrfs-progs, snapper, initramfs-tools, util-linux, findutils
+Description: ShellOS boot integration (Limine + Btrfs snapshots)
+ Keeps kernels on the EFI system partition, generates the Limine menu with
+ a safe mode, older kernels and bootable Snapper snapshots (RAM overlay),
+ and provides shellos-rollback to promote a snapshot to the root.

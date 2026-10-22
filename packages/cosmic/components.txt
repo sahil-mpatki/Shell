@@ -1,0 +1,31 @@
+# COSMIC components rebuilt for Debian trixie.
+# <package-source-dir>  <origin>
+# origin "epoch" = submodule of pop-os/cosmic-epoch at $EPOCH (pinned commit);
+# anything else = git URL, built at the commit pinned in pins.txt.
+cosmic-app-library         epoch
+cosmic-applets             epoch
+cosmic-bg                  epoch
+cosmic-comp                epoch
+cosmic-edit                epoch
+cosmic-files               epoch
+cosmic-greeter             epoch
+cosmic-icons               epoch
+cosmic-idle                epoch
+cosmic-launcher            epoch
+cosmic-notifications       epoch
+cosmic-osd                 epoch
+cosmic-osk                 epoch
+cosmic-panel               epoch
+cosmic-player              epoch
+cosmic-randr               epoch
+cosmic-screenshot          epoch
+cosmic-session             epoch
+cosmic-settings            epoch
+cosmic-settings-daemon     epoch
+cosmic-store               epoch
+cosmic-wallpapers          epoch
+cosmic-workspaces-epoch    epoch
+pop-launcher               epoch
+xdg-desktop-portal-cosmic  epoch
+pop-fonts                  https://github.com/pop-os/fonts.git
+pop-icon-theme             https://github.com/pop-os/icon-theme.git

@@ -1,0 +1,15 @@
+Source: shellos-tuning
+Section: admin
+Priority: optional
+Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: shellos-tuning
+Architecture: amd64
+Depends: ${misc:Depends}, ${shlibs:Depends}, systemd, systemd-zram-generator, systemd-oomd
+Description: ShellOS kernel and memory tuning
+ sysctl, I/O scheduler and THP/MGLRU defaults for ShellOS, zram swap with
+ lz4 + zstd idle recompression, and shellos-senpai, a PSI-driven proactive
+ reclaimer modelled on Meta's TMO.

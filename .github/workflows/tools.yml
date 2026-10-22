@@ -1,0 +1,35 @@
+name: tools
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/scx/**'
+      - 'packages/autofdo/**'
+      - 'scripts/build-git-deb.sh'
+      - '.github/workflows/tools.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [scx, autofdo]
+    env:
+      CI_REV: ${{ github.run_number }}
+    steps:
+      - name: Tooling (Rust from trixie-backports for scx)
+        run: |
+          echo "deb http://deb.debian.org/debian trixie-backports main" > /etc/apt/sources.list.d/backports.list
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates build-essential devscripts equivs
+          apt-get install -y --no-install-recommends -t trixie-backports cargo rustc
+      - uses: actions/checkout@v4
+      - run: scripts/build-git-deb.sh packages/${{ matrix.package }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debs-${{ matrix.package }}
+          path: out/packages/*.deb
+          retention-days: 90

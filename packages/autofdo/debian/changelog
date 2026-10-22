@@ -1,0 +1,5 @@
+shellos-autofdo (0.30.1-1shellos1) trixie; urgency=medium
+
+  * Package google/autofdo v0.30.1 (create_llvm_prof) for ShellOS.
+
+ -- Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>  Thu, 22 Oct 2026 08:00:00 +0000

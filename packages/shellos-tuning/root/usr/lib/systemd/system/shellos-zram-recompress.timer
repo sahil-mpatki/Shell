@@ -1,0 +1,10 @@
+[Unit]
+Description=Periodically recompress idle zram pages
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=10min
+RandomizedDelaySec=1min
+
+[Install]
+WantedBy=timers.target

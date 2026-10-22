@@ -1,0 +1,44 @@
+name: packages
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/shellos-*/**'
+      - 'packages/limine/**'
+      - 'scripts/**'
+      - '.github/workflows/packages.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    env:
+      CI_REV: ${{ github.run_number }}
+    steps:
+      - name: Tooling
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates curl \
+            build-essential devscripts equivs debhelper python3 librsvg2-bin \
+            nasm mtools clang lld llvm
+      - uses: actions/checkout@v4
+      - name: ShellOS packages
+        run: |
+          set -eux
+          mkdir -p out/packages
+          for p in shellos-branding shellos-tuning shellos-boot shellos-kernel-tools \
+                   shellos-desktop shellos-installer; do
+            scripts/ci-version.sh "packages/$p" "$CI_REV"
+            (cd "packages/$p" &&
+             mk-build-deps -i -r -t 'apt-get -y --no-install-recommends' debian/control &&
+             dpkg-buildpackage -b -us -uc)
+          done
+          mv packages/*.deb out/packages/
+      - name: Limine
+        run: packages/limine/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debs-packages
+          path: out/packages/*.deb
+          retention-days: 90

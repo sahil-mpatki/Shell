@@ -1,0 +1,18 @@
+Source: shellos-autofdo
+Section: devel
+Priority: optional
+Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13), cmake, ninja-build, clang, lld, libunwind-dev,
+ libgflags-dev, libssl-dev, libelf-dev, protobuf-compiler, libprotobuf-dev, libzstd-dev,
+ zlib1g-dev, python3
+Standards-Version: 4.7.0
+Homepage: https://github.com/google/autofdo
+Rules-Requires-Root: no
+
+Package: shellos-autofdo
+Architecture: amd64
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Conflicts: autofdo
+Description: AutoFDO/Propeller profile converter (create_llvm_prof) v0.30.1
+ Newer than Debian's autofdo 0.19: needed by shellos-kernel-profile to
+ turn LBR samples into Propeller profiles for the ShellOS kernel.

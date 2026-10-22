@@ -1,0 +1,43 @@
+name: kernel
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'kernel/**'
+      - '.github/workflows/kernel.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # -dbg package goes to a GitHub release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space (a debug-info LTO kernel needs ~30 GB)
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache \
+            /usr/local/share/boost /usr/share/swift
+          df -h /
+      - name: Build in Debian trixie
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src -e SHELL_REV=${{ github.run_number }} \
+            debian:trixie bash -c 'kernel/build.sh --install-deps && kernel/build.sh'
+          sudo chown -R "$(id -u):$(id -g)" out
+      - name: Publish debug symbols (for shellos-kernel-profile)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          dbg=$(ls out/kernel/linux-image-*-dbg_*.deb)
+          krel=$(basename "$dbg" | sed 's/^linux-image-\(.*\)-dbg_.*/\1/')
+          tag="kernel-$krel-${{ github.run_number }}"
+          gh release create "$tag" "$dbg" --title "Kernel $krel debug symbols" \
+            --notes "Debug symbols for $krel, used by shellos-kernel-profile." --latest=false
+          rm "$dbg"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debs-kernel
+          path: out/kernel/*.deb
+          retention-days: 90

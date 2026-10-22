@@ -1,0 +1,7 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_auto_install:
+	mkdir -p debian/shellos-kernel-tools
+	cp -a root/. debian/shellos-kernel-tools/

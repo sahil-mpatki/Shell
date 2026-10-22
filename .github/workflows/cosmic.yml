@@ -1,0 +1,39 @@
+name: cosmic
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/cosmic/**'
+      - '.github/workflows/cosmic.yml'
+  workflow_dispatch:
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs:
+      components: ${{ steps.list.outputs.components }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: echo "components=$(packages/cosmic/build.sh --list | jq -Rnc '[inputs]')" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: list
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        component: ${{ fromJSON(needs.list.outputs.components) }}
+    env:
+      CI_REV: ${{ github.run_number }}
+    steps:
+      - run: apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v4
+      - run: packages/cosmic/build.sh ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debs-cosmic-${{ matrix.component }}
+          path: out/packages/*.deb
+          retention-days: 90

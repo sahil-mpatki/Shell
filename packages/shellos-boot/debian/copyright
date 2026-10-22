@@ -1,0 +1,6 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: shellos-boot
+
+Files: *
+Copyright: 2026 Sahil Patki
+License: GPL-2.0-or-later

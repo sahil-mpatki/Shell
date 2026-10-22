@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+%:
+	dh $@ --buildsystem=cmake+ninja
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DENABLE_TOOL=LLVM -DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DBUILD_TESTING=OFF
+
+override_dh_auto_install:
+	install -Dm755 obj-*/create_llvm_prof debian/shellos-autofdo/usr/bin/create_llvm_prof
+
+override_dh_auto_test:
+override_dh_dwz:

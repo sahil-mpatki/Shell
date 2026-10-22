@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Install ShellOS
+Comment=Install ShellOS to this computer
+Exec=shellos-install
+Icon=shellos
+Terminal=false
+Categories=System;

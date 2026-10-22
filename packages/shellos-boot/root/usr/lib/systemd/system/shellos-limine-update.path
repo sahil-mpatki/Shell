@@ -1,0 +1,9 @@
+[Unit]
+Description=Refresh the Limine menu when Snapper snapshots change
+
+[Path]
+PathChanged=/.snapshots
+Unit=shellos-limine-update.service
+
+[Install]
+WantedBy=multi-user.target

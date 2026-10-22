@@ -1,0 +1,16 @@
+Source: shellos-installer
+Section: admin
+Priority: optional
+Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13), librsvg2-bin, python3
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: shellos-installer
+Architecture: all
+Depends: ${misc:Depends}, calamares, shellos-boot, shellos-branding, squashfs-tools, btrfs-progs, dosfstools, efibootmgr, sudo
+Conflicts: calamares-settings-debian
+Description: ShellOS live-media installer (Calamares settings)
+ Calamares configuration for ShellOS: GPT with a 1 GiB ESP, Btrfs with
+ @, @home, @snapshots, @log and @cache subvolumes (zstd compression),
+ zsh as the login shell, and Limine as the bootloader.

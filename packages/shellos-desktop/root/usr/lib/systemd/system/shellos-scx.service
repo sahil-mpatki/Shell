@@ -1,0 +1,17 @@
+[Unit]
+Description=sched_ext BPF CPU scheduler
+Documentation=https://github.com/sahil-mpatki/Shell/blob/main/docs/KERNEL.md
+ConditionPathExists=/sys/kernel/sched_ext
+After=power-profiles-daemon.service
+StartLimitIntervalSec=120
+StartLimitBurst=3
+
+[Service]
+EnvironmentFile=/etc/default/shellos-scx
+# systemd won't expand a variable as the executable, so go through sh.
+ExecStart=/bin/sh -c 'exec "/usr/bin/$SCX_SCHEDULER" $SCX_FLAGS'
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
