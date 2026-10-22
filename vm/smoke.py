@@ -145,7 +145,7 @@ def checks(sh):
     if ours:
         check("BORE scheduler", "cat /proc/sys/kernel/sched_bore")
         # recomp_algorithm lists every algorithm; the selected one is [bracketed].
-        check("zram zstd recompression", "grep '^#1:' /sys/block/zram0/recomp_algorithm",
+        check("zram zstd recompression", "grep -a '^#1:' /sys/block/zram0/recomp_algorithm",
               lambda rc, o: "[zstd]" in o)
         check("idle governor (NAP)", "cat /sys/devices/system/cpu/cpuidle/current_governor",
               lambda rc, o: o == "nap", required=False)  # VMs often expose no cpuidle states
