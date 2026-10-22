@@ -159,7 +159,7 @@ build_meta() {
 	Section: kernel
 	Priority: optional
 	Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
-	Depends: linux-image-$krel (= $ver)
+	Depends: linux-image-$krel (= $ver), initramfs-tools
 	Recommends: linux-headers-$krel (= $ver)
 	Description: ShellOS kernel (tracks the newest build)
 	 Currently $krel, built with -march=$MARCH.

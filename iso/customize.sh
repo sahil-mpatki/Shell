@@ -82,6 +82,13 @@ if [[ -f $ROOT/usr/share/applications/shellos-install.desktop ]]; then
 fi
 
 # --- initramfs with live-boot + plymouth theme -----------------------------------
+# bindeb-pkg kernels don't depend on initramfs-tools, so on a fresh bootstrap
+# dpkg may configure the kernel first and no initrd gets made. Create any
+# that are missing, then refresh the rest.
+for k in "$ROOT"/boot/vmlinuz-*; do
+	v="${k##*/vmlinuz-}"
+	[[ -f $ROOT/boot/initrd.img-$v ]] || in_root update-initramfs -c -k "$v"
+done
 in_root update-initramfs -u -k all
 
 # --- shrink ------------------------------------------------------------------
