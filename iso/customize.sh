@@ -52,6 +52,10 @@ fi
 sed -i 's|^#\?DSHELL=.*|DSHELL=/bin/zsh|' "$ROOT/etc/adduser.conf"
 sed -i 's|^#\? *SHELL=.*|SHELL=/bin/zsh|' "$ROOT/etc/default/useradd"
 
+# Images without shellos-desktop have no skel .zshrc; give new users an
+# empty one so zsh doesn't greet them with its first-run wizard.
+[[ -e $ROOT/etc/skel/.zshrc ]] || echo "# ~/.zshrc" > "$ROOT/etc/skel/.zshrc"
+
 echo shellos > "$ROOT/etc/hostname"
 
 # --- live session ------------------------------------------------------------

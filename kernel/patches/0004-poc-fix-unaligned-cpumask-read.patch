@@ -1,0 +1,34 @@
+From: ShellOS <161210761+sahil-mpatki@users.noreply.github.com>
+Subject: [PATCH] sched/poc: fix out-of-bounds read and UB shift in poc_cpumask_to_u64
+
+The unaligned slow path always read the cpumask word after base_word and
+shifted it left by (64 - shift). With shift == 0 that is a shift by 64
+(undefined; on x86 the count wraps so the extra word is ORed into the
+result), and with NR_CPUS <= 64 the extra word lies past the end of the
+cpumask. UBSAN reports both at boot from select_task_rq_fair() while
+sched_poc_aligned is not yet enabled.
+
+Return the low word when there is nothing to shift, and treat a missing
+next word as empty.
+---
+--- a/kernel/sched/sched.h
++++ b/kernel/sched/sched.h
+@@ -3246,7 +3246,17 @@
+ 		/* Slow path: shift required (e.g., Threadripper) */
+ 		int shift = sd_share->poc_affinity_shift;
+ 		u64 lo = cpumask_bits(mask)[base_word];
+-		u64 hi = cpumask_bits(mask)[base_word + 1];
++		u64 hi;
++
++		/*
++		 * shift == 0 would make "hi << 64" undefined (x86 wraps it to
++		 * a no-op and ORs @hi in), and with NR_CPUS <= 64 there is no
++		 * second word to read at all.
++		 */
++		if (!shift)
++			return lo;
++		hi = base_word + 1 < BITS_TO_LONGS(NR_CPUS) ?
++			cpumask_bits(mask)[base_word + 1] : 0;
+ 		return (lo >> shift) | (hi << (64 - shift));
+ 	}
+ }

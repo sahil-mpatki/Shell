@@ -144,7 +144,9 @@ def checks(sh):
     check("ShellOS kernel", "uname -r", lambda rc, o: "shellos" in o, required=False)
     if ours:
         check("BORE scheduler", "cat /proc/sys/kernel/sched_bore")
-        check("zram zstd recompression", "cat /sys/block/zram0/recomp_algorithm", lambda rc, o: "zstd" in o)
+        # recomp_algorithm lists every algorithm; the selected one is [bracketed].
+        check("zram zstd recompression", "grep '^#1:' /sys/block/zram0/recomp_algorithm",
+              lambda rc, o: "[zstd]" in o)
         check("idle governor (NAP)", "cat /sys/devices/system/cpu/cpuidle/current_governor",
               lambda rc, o: o == "nap", required=False)  # VMs often expose no cpuidle states
     if "scx-scheds" in pkgs and ours:

@@ -2,6 +2,8 @@
 #   0001  https://github.com/firelzrd/bore-scheduler  patches/stable/0001-linux6.18.48-bore-7.0.0.patch @ 1e2f57ad74e8
 #   0002  https://github.com/CachyOS/kernel-patches   6.18/misc/poc-selector.patch               @ 6847663965a6
 #   0003  https://github.com/CachyOS/kernel-patches   6.18/misc/nap-governor.patch               @ 6847663965a6
+#   0004  ShellOS fix for 0002: out-of-bounds read + undefined shift (found by UBSAN in VM boot)
 0001-bore-7.0.0.patch
 0002-poc-selector-v2.1.0.patch
 0003-nap-governor-v0.5.0.patch
+0004-poc-fix-unaligned-cpumask-read.patch
