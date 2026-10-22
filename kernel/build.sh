@@ -6,6 +6,8 @@
 #   kernel/build.sh --check         --config-only, then compile the patched
 #                                   subsystems (kernel/sched, drivers/cpuidle)
 #   kernel/build.sh --install-deps  apt-get the build dependencies (Debian/Ubuntu)
+#   kernel/build.sh --resume        continue an interrupted build in the
+#                                   existing tree (no re-extract/re-config)
 #
 # Environment:
 #   LLVM_SUFFIX   clang/lld version suffix (default: -19, Debian trixie)
@@ -174,6 +176,7 @@ check() {
 
 case "$MODE" in
 	--install-deps) install_deps ;;
+	--resume)       [[ -f $SRC/.config ]] || die "nothing to resume in $SRC"; build ;;
 	build)          fetch; extract_and_patch; configure; build ;;
 	--config-only)  fetch; extract_and_patch; configure ;;
 	--check)        fetch; extract_and_patch; configure; check ;;
