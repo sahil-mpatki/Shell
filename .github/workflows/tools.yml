@@ -1,7 +1,7 @@
 name: tools
 on:
   push:
-    branches: [main]
+    branches: [shellos-bootstrap]
     paths:
       - 'packages/scx/**'
       - 'packages/autofdo/**'

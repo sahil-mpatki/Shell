@@ -39,9 +39,14 @@ automatically at `https://sahil-mpatki.github.io/Shell/apt/shellos-archive.asc`.
 | `cosmic` | 27 COSMIC components in parallel | ~1 h |
 | `kernel` | the ShellOS kernel | ~4–5 h |
 
-Each one triggers `publish`, which rebuilds the apt repo. When all four have
-published, run **`iso`** (it also runs weekly). The ISO appears under
-**Releases**.
+Each one triggers `publish`, which rebuilds the apt repo. They also run by
+themselves whenever their part of the repo changes on `shellos-bootstrap`.
+
+When all four have published, run **`iso`** with a **version** such as
+`v1.0.0`. It builds the desktop ISO, boots it in a headless VM, and only if
+that boot test passes publishes it under **Releases** (ISOs over 2 GiB are
+split into parts; the release notes show how to join and verify them).
+Without a version it publishes a dated pre-release, as the weekly run does.
 
 ## 5. Install
 

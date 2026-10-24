@@ -1,6 +1,8 @@
 name: iso
-# Build the live/installer ISO from the published apt repo and attach it to a
-# release. Runs weekly and on demand (Actions -> iso -> Run workflow).
+# Build the live/installer ISO from the published apt repo, boot-test it in a
+# VM, and publish it as a GitHub release (only if the boot test passes).
+# Runs weekly (dated pre-release) and on demand (Actions -> iso -> Run
+# workflow); give a version such as v1.0.0 for a full release.
 on:
   workflow_dispatch:
     inputs:
@@ -9,6 +11,10 @@ on:
         default: desktop
         type: choice
         options: [desktop, minimal]
+      version:
+        description: Release version (e.g. v1.0.0). Empty = dated pre-release.
+        default: ''
+        type: string
   schedule:
     - cron: '17 4 * * 0'   # weekly, Sunday 04:17 UTC
 
@@ -42,11 +48,13 @@ jobs:
               iso/build.sh "'"$PROFILE"'"'
           sudo chown -R "$(id -u):$(id -g)" out
       - name: Boot test (headless VM, serial console)
+        shell: bash -o pipefail -e {0}
         run: |
           sudo apt-get update && sudo apt-get install -y --no-install-recommends qemu-system-x86 ovmf xorriso
           # Standard GitHub runners expose KVM; let this user use it.
           if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; fi
-          python3 vm/smoke.py out/iso/*.iso --out out/vm
+          mkdir -p out/vm
+          python3 vm/smoke.py out/iso/*.iso --out out/vm | tee out/vm/smoke.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -56,9 +64,47 @@ jobs:
       - name: Release
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
         run: |
           iso=$(ls out/iso/*.iso)
-          tag="iso-$(date -u +%Y%m%d)-${{ github.run_number }}"
-          gh release create "$tag" "$iso" "$iso.sha256" \
-            --title "ShellOS $PROFILE $(date -u +%Y-%m-%d)" \
-            --notes "Live/installer ISO built from the ShellOS apt repo. Write it with: sudo dd if=$(basename "$iso") of=/dev/sdX bs=4M status=progress oflag=sync"
+          name=$(basename "$iso")
+          today=$(date -u +%Y-%m-%d)
+          if [ -n "$VERSION" ]; then
+            tag="$VERSION"; title="ShellOS $VERSION ($PROFILE)"; kind=(--latest)
+          else
+            tag="iso-$(date -u +%Y%m%d)-${{ github.run_number }}"
+            title="ShellOS $PROFILE $today (weekly)"; kind=(--prerelease)
+          fi
+          # Release assets are capped at 2 GiB; split anything bigger.
+          assets=("$iso.sha256")
+          if [ "$(stat -c %s "$iso")" -gt $((2000 * 1024 * 1024)) ]; then
+            split -b 1900M -d "$iso" "$iso.part"
+            assets+=("$iso".part*)
+            get="cat $name.part* > $name && sha256sum -c $name.sha256"
+          else
+            assets+=("$iso")
+            get="sha256sum -c $name.sha256"
+          fi
+          {
+            echo "ShellOS live/installer ISO ($PROFILE), built $today from commit ${GITHUB_SHA::7}."
+            echo
+            echo '### Verify'
+            echo '```sh'
+            echo "$get"
+            echo '```'
+            echo
+            echo '### Try it in a VM first'
+            echo '```sh'
+            echo "vm/shellos-vm live $name"
+            echo '```'
+            echo 'See [docs/VM.md](../../blob/'"$GITHUB_SHA"'/docs/VM.md). Install to hardware: [docs/SETUP.md](../../blob/'"$GITHUB_SHA"'/docs/SETUP.md).'
+            echo
+            echo '### Boot test (CI, headless VM)'
+            echo '```'
+            cat out/vm/smoke.txt
+            echo '```'
+            echo
+            echo 'Requires an x86-64 CPU with Alder Lake-class integer extensions (Intel 12th gen+, AMD Zen 3+).'
+          } > notes.md
+          gh release create "$tag" "${assets[@]}" --target "$GITHUB_SHA" \
+            --title "$title" --notes-file notes.md "${kind[@]}"

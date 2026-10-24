@@ -1,7 +1,7 @@
 name: kernel
 on:
   push:
-    branches: [main]
+    branches: [shellos-bootstrap]
     paths:
       - 'kernel/**'
       - '.github/workflows/kernel.yml'

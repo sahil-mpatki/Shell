@@ -1,7 +1,7 @@
 name: packages
 on:
   push:
-    branches: [main]
+    branches: [shellos-bootstrap]
     paths:
       - 'packages/shellos-*/**'
       - 'packages/limine/**'

@@ -1,7 +1,7 @@
 name: cosmic
 on:
   push:
-    branches: [main]
+    branches: [shellos-bootstrap]
     paths:
       - 'packages/cosmic/**'
       - '.github/workflows/cosmic.yml'

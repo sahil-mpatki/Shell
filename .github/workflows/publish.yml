@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: [kernel, packages, cosmic, tools]
     types: [completed]
-    branches: [main]
+    branches: [shellos-bootstrap]
   workflow_dispatch:
 
 permissions:
@@ -42,7 +42,7 @@ jobs:
         run: |
           mkdir -p new
           for wf in kernel packages cosmic tools; do
-            id=$(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf.yml" --branch main \
+            id=$(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf.yml" --branch "${{ github.event.repository.default_branch }}" \
                  --status completed -L 1 --json databaseId -q '.[0].databaseId')
             if [ -n "$id" ]; then
               echo "$wf: run $id"
