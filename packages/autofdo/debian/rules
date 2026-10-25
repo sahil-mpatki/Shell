@@ -2,9 +2,15 @@
 %:
 	dh $@ --buildsystem=cmake+ninja
 
+LIBDIR := /usr/lib/$(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+# The tools link statically; see debian/eu-search.c for why libelf needs help.
 override_dh_auto_configure:
+	clang -O2 -c debian/eu-search.c -o debian/eu-search.o
+	ar rcs debian/libeu-search.a debian/eu-search.o
 	dh_auto_configure -- -DENABLE_TOOL=LLVM -DCMAKE_BUILD_TYPE=Release \
-		-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DBUILD_TESTING=OFF
+		-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DBUILD_TESTING=OFF \
+		"-DLIBELF_LIBRARIES=$(LIBDIR)/libelf.a;$(CURDIR)/debian/libeu-search.a"
 
 override_dh_auto_install:
 	install -Dm755 obj-*/create_llvm_prof debian/shellos-autofdo/usr/bin/create_llvm_prof
