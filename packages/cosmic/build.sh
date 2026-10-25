@@ -102,6 +102,18 @@ fixups() { # name dir
 			sed -i 's/Terminal: "cosmic-term"/Terminal: "alacritty"/' "$dir/data/system_actions.ron"
 			grep -q 'Terminal: "alacritty"' "$dir/data/system_actions.ron" \
 				|| die "cosmic-settings-daemon: terminal fixup no longer applies"
+			# Pop!_OS-only packages: adw-gtk3 only themes GTK3 apps, and the
+			# freedesktop sound theme stands in for Pop's.
+			sed -i -e '/^\s*adw-gtk3,$/d' \
+				-e 's/^\(\s*\)pop-sound-theme,$/\1sound-theme-freedesktop,/' "$dir/debian/control"
+			! grep -qE 'adw-gtk3,|pop-sound-theme' "$dir/debian/control" \
+				|| die "cosmic-settings-daemon: dependency fixup no longer applies"
+			;;
+		cosmic-store)
+			# Debian ships AppStream metadata through apt (DEP-11) instead.
+			sed -i 's/^\(\s*\)appstream-data-pop,$/\1appstream,/' "$dir/debian/control"
+			! grep -q appstream-data-pop "$dir/debian/control" \
+				|| die "cosmic-store: dependency fixup no longer applies"
 			;;
 		pop-icon-theme)
 			# Debian dropped the -full split; adwaita-icon-theme has everything.
