@@ -6,6 +6,11 @@ on:
       - 'packages/cosmic/**'
       - '.github/workflows/cosmic.yml'
   workflow_dispatch:
+    inputs:
+      components:
+        description: 'Only these components (space-separated; empty = all)'
+        required: false
+        default: ''
 
 jobs:
   list:
@@ -15,7 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: list
-        run: echo "components=$(packages/cosmic/build.sh --list | jq -Rnc '[inputs]')" >> "$GITHUB_OUTPUT"
+        env:
+          ONLY: ${{ inputs.components }}
+        run: |
+          if [[ -n $ONLY ]]; then list=$(tr ' ' '\n' <<< "$ONLY" | grep .); else list=$(packages/cosmic/build.sh --list); fi
+          echo "components=$(jq -Rnc '[inputs]' <<< "$list")" >> "$GITHUB_OUTPUT"
 
   build:
     needs: list

@@ -5,6 +5,7 @@
 #   packages/cosmic/build.sh cosmic-comp ... build only these
 #   packages/cosmic/build.sh --list          print component names (for CI)
 #   CLEAN_AFTER=1 ...                         delete each Rust build tree once packaged
+#   SHELLOS_APT_URL=...                       repo for inter-component build deps ("" = none)
 #
 # Runs as root inside a debian:trixie container. Rust comes from
 # trixie-backports because COSMIC needs a newer rustc than trixie's 1.85.
@@ -19,6 +20,7 @@ WORKDIR="${WORKDIR:-$REPO/build/cosmic}"
 OUTDIR="${OUTDIR:-$REPO/out/packages}"
 SUFFIX="+shellos${CI_REV:-1}"
 JUST_VERSION=1.59.0
+SHELLOS_APT_URL="${SHELLOS_APT_URL-https://sahil-mpatki.github.io/Shell/apt}"
 
 log() { printf '\033[1;36m==> %s\033[0m\n' "$*"; }
 die() { printf '\033[1;31mxx  %s\033[0m\n' "$*" >&2; exit 1; }
@@ -38,6 +40,18 @@ setup_toolchain() {
 	apt-get update
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 		build-essential ca-certificates curl devscripts equivs git just
+	# Some components build-depend on others (cosmic-osd on cosmic-randr).
+	# CI builds each on its own runner, so take those from the ShellOS repo.
+	if [[ -n $SHELLOS_APT_URL ]] && [[ ! -f /etc/apt/sources.list.d/shellos.list ]]; then
+		mkdir -p /etc/apt/keyrings
+		if curl -fsSL "$SHELLOS_APT_URL/shellos-archive.asc" -o /etc/apt/keyrings/shellos-archive.asc; then
+			echo "deb [signed-by=/etc/apt/keyrings/shellos-archive.asc] $SHELLOS_APT_URL trixie main" \
+				> /etc/apt/sources.list.d/shellos.list
+			apt-get update
+		else
+			log "ShellOS repo not reachable; inter-component build deps must be installed locally"
+		fi
+	fi
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 		-t trixie-backports cargo rustc
 	log "rustc: $(rustc --version)"
@@ -121,7 +135,8 @@ build_component() { # name origin
 	mkdir -p "$shim"
 	printf '#!/bin/sh\nexit 1\n' > "$shim/ischroot"
 	chmod +x "$shim/ischroot"
-	PATH="$shim:$PATH" dpkg-buildpackage -b -us -uc
+	# Some justfiles run under `sh -u` and stamp the commit into the binary.
+	SOURCE_GIT_HASH="$(git rev-parse HEAD)" PATH="$shim:$PATH" dpkg-buildpackage -b -us -uc
 	mkdir -p "$OUTDIR"
 	mv ../*.deb "$OUTDIR"/
 	rm -f ../*.buildinfo ../*.changes
