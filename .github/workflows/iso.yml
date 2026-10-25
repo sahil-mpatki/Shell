@@ -30,11 +30,23 @@ jobs:
       SHELLOS_APT_URL: https://sahil-mpatki.github.io/Shell/apt
     steps:
       - uses: actions/checkout@v4
-      - name: Free disk space
-        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
       - name: Fetch the ShellOS archive key
-        run: curl -fsSL "$SHELLOS_APT_URL/shellos-archive.asc" -o iso/keys/shellos-archive.asc
+        id: repo
+        run: |
+          if curl -fsSL "$SHELLOS_APT_URL/shellos-archive.asc" -o iso/keys/shellos-archive.asc; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          elif [ "$GITHUB_EVENT_NAME" = schedule ]; then
+            echo "::notice::No ShellOS apt repo published yet at $SHELLOS_APT_URL; skipping this week's ISO (see docs/SETUP.md)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::No ShellOS apt repo at $SHELLOS_APT_URL. Run the package builds and 'publish' first (docs/SETUP.md)."
+            exit 1
+          fi
+      - name: Free disk space
+        if: steps.repo.outputs.ready == 'true'
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
       - name: Build ISO in Debian trixie
+        if: steps.repo.outputs.ready == 'true'
         run: |
           docker run --rm --privileged -v "$PWD:/src" -w /src \
             -e SHELLOS_APT_URL -e DEB_DIRS=/nonexistent debian:trixie bash -euxc '
@@ -48,6 +60,7 @@ jobs:
               iso/build.sh "'"$PROFILE"'"'
           sudo chown -R "$(id -u):$(id -g)" out
       - name: Boot test (headless VM, serial console)
+        if: steps.repo.outputs.ready == 'true'
         shell: bash -o pipefail -e {0}
         run: |
           sudo apt-get update && sudo apt-get install -y --no-install-recommends qemu-system-x86 ovmf xorriso
@@ -56,12 +69,13 @@ jobs:
           mkdir -p out/vm
           python3 vm/smoke.py out/iso/*.iso --profile "$PROFILE" --out out/vm | tee out/vm/smoke.txt
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.repo.outputs.ready == 'true'
         with:
           name: vm-smoke
           path: out/vm/
           retention-days: 30
       - name: Release
+        if: steps.repo.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ inputs.version }}
