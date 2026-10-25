@@ -11,7 +11,7 @@ jobs:
       - name: shellcheck
         run: |
           shellcheck -S warning \
-            kernel/build.sh iso/*.sh scripts/*.sh packages/*/build.sh vm/shellos-vm \
+            kernel/build.sh iso/*.sh scripts/*.sh packages/*/build.sh vm/shellos-vm tests/*.sh \
             packages/shellos-*/root/usr/bin/* packages/shellos-*/root/usr/sbin/* \
             packages/shellos-*/root/usr/libexec/shellos/install-bootloader \
             packages/shellos-tuning/root/usr/libexec/shellos/zram-recompress \
@@ -35,3 +35,25 @@ jobs:
       - uses: actions/checkout@v4
       - run: kernel/build.sh --install-deps
       - run: kernel/build.sh --config-only
+
+  rollback:
+    # shellos-limine-update + shellos-rollback on a real btrfs loop device,
+    # including injected snapshot and menu-update failures.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          docker run --rm --privileged -v "$PWD:/src" -w /src debian:trixie bash -euxc '
+            apt-get update
+            apt-get install -y --no-install-recommends mmdebstrap btrfs-progs util-linux ca-certificates
+            printf stub > /tmp/BOOTX64.EFI
+            LIMINE_EFI=/tmp/BOOTX64.EFI tests/rollback.sh'
+
+  limine:
+    # The real .deb build on trixie (host tools + firmware stages).
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - run: apt-get update && apt-get install -y --no-install-recommends git ca-certificates curl build-essential debhelper nasm mtools clang lld llvm
+      - uses: actions/checkout@v4
+      - run: packages/limine/build.sh
