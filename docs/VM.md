@@ -65,12 +65,18 @@ Things worth trying in the installed VM:
 vm/shellos-vm smoke shellos-desktop-*.iso
 ```
 
-This boots the ISO headless, logs in over a serial console and checks the
-essentials: ShellOS identity, no failed units, zram swap, sysctl/MGLRU
-tuning, the ShellOS kernel features (BORE, zstd recompression,
-sched_ext/LAVD), and for the desktop a running COSMIC session. It prints a
-PASS/FAIL table, saves `out/vm/smoke-serial.log` and a screenshot
-`out/vm/smoke-screen.png`, and exits non-zero on failure. The `iso` workflow
+This boots the ISO headless, logs in over a serial console and checks it
+against its **profile** (taken from the file name, or `--profile`):
+ShellOS identity, no failed units, zram swap, sysctl/MGLRU tuning, every
+apt source reachable, and the ShellOS kernel with BORE and zstd
+recompression. A `desktop` image must additionally have the COSMIC
+packages, a running COSMIC session, LAVD active, the installer and Firefox:
+missing pieces fail rather than being skipped. `--profile diagnostic`
+relaxes the kernel checks for stock-kernel test images and is reported as
+not releasable. It prints a
+PASS/FAIL table, saves `out/vm/smoke-serial.log`, `out/vm/qemu-stderr.log`
+and a screenshot `out/vm/smoke-screen.png` (also when the boot fails), and
+exits non-zero on failure. The `iso` workflow
 runs the same test on every ISO it builds.
 
 ## Settings

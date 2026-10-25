@@ -9,27 +9,17 @@ in_root() { chroot "$ROOT" "$@"; }
 
 # --- apt sources for the installed system ------------------------------------
 rm -f "$ROOT/etc/apt/sources.list"
-install -Dm644 "$HERE/keys/packages.mozilla.org.asc" "$ROOT/etc/apt/keyrings/packages.mozilla.org.asc"
-cat > "$ROOT/etc/apt/sources.list.d/debian.sources" <<'EOF'
-Types: deb
-URIs: http://deb.debian.org/debian
-Suites: trixie trixie-updates trixie-backports
-Components: main contrib non-free non-free-firmware
-Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
-
-Types: deb
-URIs: http://security.debian.org/debian-security
-Suites: trixie-security
-Components: main contrib non-free non-free-firmware
-Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
-EOF
-cat > "$ROOT/etc/apt/sources.list.d/mozilla.sources" <<'EOF'
+# Mozilla's repo only where Firefox is part of the image (desktop).
+if [[ -e $ROOT/usr/bin/firefox ]]; then
+	install -Dm644 "$HERE/keys/packages.mozilla.org.asc" "$ROOT/etc/apt/keyrings/packages.mozilla.org.asc"
+	cat > "$ROOT/etc/apt/sources.list.d/mozilla.sources" <<'EOF'
 Types: deb
 URIs: https://packages.mozilla.org/apt
 Suites: mozilla
 Components: main
 Signed-By: /etc/apt/keyrings/packages.mozilla.org.asc
 EOF
+fi
 # ShellOS's own repo (kernel, COSMIC, shellos-*), once its key is published.
 if [[ -f $HERE/keys/shellos-archive.asc ]]; then
 	install -Dm644 "$HERE/keys/shellos-archive.asc" "$ROOT/etc/apt/keyrings/shellos-archive.asc"
@@ -65,7 +55,7 @@ cat > "$ROOT/etc/live/config.conf.d/shellos.conf" <<'EOF'
 LIVE_HOSTNAME="shellos"
 LIVE_USERNAME="shell"
 LIVE_USER_FULLNAME="ShellOS Live"
-LIVE_USER_DEFAULT_GROUPS="audio cdrom dip floppy video plugdev netdev powerdev scanner bluetooth sudo render"
+LIVE_USER_DEFAULT_GROUPS="audio cdrom dip floppy video plugdev netdev bluetooth sudo render"
 EOF
 if [[ -f $ROOT/etc/greetd/cosmic-greeter.toml ]]; then
 	sed '/^\[default_session\]/i [initial_session]\ncommand = "start-cosmic"\nuser = "shell"\n' \

@@ -54,7 +54,7 @@ jobs:
           # Standard GitHub runners expose KVM; let this user use it.
           if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; fi
           mkdir -p out/vm
-          python3 vm/smoke.py out/iso/*.iso --out out/vm | tee out/vm/smoke.txt
+          python3 vm/smoke.py out/iso/*.iso --profile "$PROFILE" --out out/vm | tee out/vm/smoke.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:

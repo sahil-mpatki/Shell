@@ -7,6 +7,8 @@ live-config
 live-config-systemd
 user-setup
 locales
+# HTTPS apt sources (ShellOS repo, Mozilla) need a trust store
+ca-certificates
 # VM guest integration (inactive on real hardware): clipboard, resize, agent
 spice-vdagent
 qemu-guest-agent

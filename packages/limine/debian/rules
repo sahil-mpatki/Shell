@@ -1,6 +1,10 @@
 #!/usr/bin/make -f
-# Limine's firmware stages are freestanding; distro hardening flags don't apply.
-export DEB_BUILD_MAINT_OPTIONS = hardening=-all
+# Limine's firmware stages are freestanding and set their own flags, so
+# distro hardening is off. Keep PIE at the compiler default, though:
+# "-pie" injects no-pie *compile* specs into CFLAGS_FOR_BUILD, but the
+# host tools (e.g. limlzpack) compile and link in one step without
+# LDFLAGS, so they'd link non-PIC objects as PIE and fail.
+export DEB_BUILD_MAINT_OPTIONS = hardening=-all,+pie
 
 %:
 	dh $@

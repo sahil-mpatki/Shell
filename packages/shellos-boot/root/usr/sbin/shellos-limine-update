@@ -27,19 +27,36 @@ if ! mountpoint -q "$ESP"; then
 fi
 
 # --- root filesystem ---------------------------------------------------------
-# Inside a booted snapshot / is an overlay, so read the real root from the
-# kernel command line's root= (which still names the btrfs filesystem).
-ROOT_SRC="$(findmnt -no SOURCE / | sed 's/\[.*//')"
+# The menu is for the root that will boot next: the ShellOS layout always
+# boots the @ subvolume (SHELLOS_ROOT_SUBVOL to override). That is not
+# necessarily what is mounted at / right now: inside a booted snapshot /
+# is an overlay, and after shellos-rollback the running root has been
+# renamed to @rollback-*. In those cases kernels are read from the real
+# target subvolume via a temporary mount of the btrfs top level.
 ROOT_FSTYPE="$(findmnt -no FSTYPE /)"
 if [[ $ROOT_FSTYPE == overlay ]]; then
 	ROOT_UUID="$(sed -n 's/.*root=UUID=\([^ ]*\).*/\1/p' /proc/cmdline)"
 	ROOT_FSTYPE=btrfs
-	ROOT_SUBVOL=@
+	CUR_SUBVOL=""
 else
-	ROOT_UUID="$(blkid -s UUID -o value "$ROOT_SRC")"
-	ROOT_SUBVOL="$(findmnt -no OPTIONS / | tr , '\n' | sed -n 's#^subvol=/\{0,1\}##p')"
+	ROOT_UUID="$(blkid -s UUID -o value "$(findmnt -no SOURCE / | sed 's/\[.*//')")"
+	CUR_SUBVOL="$(findmnt -no OPTIONS / | tr , '\n' | sed -n 's#^subvol=/\{0,1\}##p')"
 fi
 [[ -n $ROOT_UUID ]] || { log "cannot determine root UUID"; exit 1; }
+
+ROOT_SUBVOL=""
+TARGET=""   # prefix for /boot and /lib/modules of the root being booted
+if [[ $ROOT_FSTYPE == btrfs ]]; then
+	ROOT_SUBVOL="${SHELLOS_ROOT_SUBVOL:-@}"
+	if [[ $CUR_SUBVOL != "$ROOT_SUBVOL" ]]; then
+		TOP="$(mktemp -d /run/shellos-limine.XXXXXX)"
+		trap 'umount "$TOP" 2>/dev/null; rmdir "$TOP"' EXIT
+		mount -o ro,subvolid=5 "UUID=$ROOT_UUID" "$TOP"
+		[[ -d $TOP/$ROOT_SUBVOL ]] || { log "no $ROOT_SUBVOL subvolume to boot"; exit 1; }
+		TARGET="$TOP/$ROOT_SUBVOL"
+		log "running root is ${CUR_SUBVOL:-an overlay}; building the menu for $ROOT_SUBVOL"
+	fi
+fi
 
 root_args() { # $1 = subvolume (may be empty)
 	local a="root=UUID=$ROOT_UUID"
@@ -63,16 +80,16 @@ install_if_changed /usr/share/limine/BOOTX64.EFI "$ESP/EFI/BOOT/BOOTX64.EFI"
 # --- kernels -------------------------------------------------------------------
 # Installed = has modules in /lib/modules and a vmlinuz + initrd in /boot.
 mapfile -t KERNELS < <(
-	for k in /boot/vmlinuz-*; do
-		v="${k#/boot/vmlinuz-}"
-		[[ -f /boot/initrd.img-$v && -d /lib/modules/$v ]] && echo "$v"
+	for k in "$TARGET"/boot/vmlinuz-*; do
+		v="${k##*/vmlinuz-}"
+		[[ -f $TARGET/boot/initrd.img-$v && -d $TARGET/lib/modules/$v ]] && echo "$v"
 	done | sort -rV
 )
 (( ${#KERNELS[@]} )) || { log "no kernels with initrd found in /boot"; exit 1; }
 
 for v in "${KERNELS[@]}"; do
-	install_if_changed "/boot/vmlinuz-$v" "$ESP/shellos/$v/vmlinuz"
-	install_if_changed "/boot/initrd.img-$v" "$ESP/shellos/$v/initrd.img"
+	install_if_changed "$TARGET/boot/vmlinuz-$v" "$ESP/shellos/$v/vmlinuz"
+	install_if_changed "$TARGET/boot/initrd.img-$v" "$ESP/shellos/$v/initrd.img"
 done
 
 # Kernels whose files are on the ESP (may include ones only snapshots need).

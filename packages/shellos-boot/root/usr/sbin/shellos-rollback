@@ -3,9 +3,11 @@
 #
 # Debian mounts / from the @ subvolume by name, so `snapper rollback` (which
 # flips the btrfs default subvolume) doesn't apply. Instead:
+#   snapshot N  -> writable copy under a temporary name
 #   @           -> @rollback-<timestamp>   (kept until you delete it)
-#   snapshot N  -> new writable @
-# then the Limine menu is regenerated. Reboot to use it.
+#   copy        -> @
+# then the Limine menu is regenerated for the new @. Any failure along the
+# way puts the original @ back, so the system always has a bootable @.
 set -euo pipefail
 
 die() { printf 'shellos-rollback: %s\n' "$*" >&2; exit 1; }
@@ -26,14 +28,35 @@ SNAP="$TOP/@snapshots/$N/snapshot"
 [[ -d $TOP/@ ]] || die "no @ subvolume at the top level"
 
 stamp="$(date +%Y%m%d-%H%M%S)"
-printf 'Roll back to snapshot %s? The current root is kept as @rollback-%s. [y/N] ' "$N" "$stamp"
+NEW="@.rollback-new-$stamp"
+OLD="@rollback-$stamp"
+printf 'Roll back to snapshot %s? The current root is kept as %s. [y/N] ' "$N" "$OLD"
 read -r ok
 [[ $ok == [yY]* ]] || die "aborted"
 
-mv "$TOP/@" "$TOP/@rollback-$stamp"
-btrfs subvolume snapshot "$SNAP" "$TOP/@"
-echo "Snapshot $N is now @. Old root: @rollback-$stamp"
-echo "Delete it once you're happy: btrfs subvolume delete <top>/@rollback-$stamp"
+# 1. Build the replacement first; nothing has changed if this fails.
+btrfs subvolume snapshot "$SNAP" "$TOP/$NEW" \
+	|| die "could not create a writable copy of snapshot $N; nothing changed"
 
-shellos-limine-update || true
+# 2. Swap it in, undoing each step if the next one fails.
+if ! mv "$TOP/@" "$TOP/$OLD"; then
+	btrfs subvolume delete "$TOP/$NEW" >/dev/null || true
+	die "could not move the current root aside; nothing changed"
+fi
+if ! mv "$TOP/$NEW" "$TOP/@"; then
+	mv "$TOP/$OLD" "$TOP/@"
+	btrfs subvolume delete "$TOP/$NEW" >/dev/null || true
+	die "could not promote snapshot $N; the original root is back in place"
+fi
+
+# 3. The boot menu must point at the new @ and its kernels.
+if ! shellos-limine-update; then
+	mv "$TOP/@" "$TOP/$NEW"
+	mv "$TOP/$OLD" "$TOP/@"
+	shellos-limine-update || true
+	die "boot menu update failed; rolled back to the original root (the snapshot copy is kept as $NEW)"
+fi
+
+echo "Snapshot $N is now @. The previous root is kept as $OLD;"
+echo "delete it once you're happy: btrfs subvolume delete <top-level>/$OLD"
 echo "Reboot to finish the rollback."

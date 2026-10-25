@@ -4,6 +4,7 @@
 #   packages/cosmic/build.sh                 build every component
 #   packages/cosmic/build.sh cosmic-comp ... build only these
 #   packages/cosmic/build.sh --list          print component names (for CI)
+#   CLEAN_AFTER=1 ...                         delete each Rust build tree once packaged
 #
 # Runs as root inside a debian:trixie container. Rust comes from
 # trixie-backports because COSMIC needs a newer rustc than trixie's 1.85.
@@ -17,6 +18,7 @@ EPOCH="${EPOCH:-epoch-1.11.0}"
 WORKDIR="${WORKDIR:-$REPO/build/cosmic}"
 OUTDIR="${OUTDIR:-$REPO/out/packages}"
 SUFFIX="+shellos${CI_REV:-1}"
+JUST_VERSION=1.59.0
 
 log() { printf '\033[1;36m==> %s\033[0m\n' "$*"; }
 die() { printf '\033[1;31mxx  %s\033[0m\n' "$*" >&2; exit 1; }
@@ -39,6 +41,13 @@ setup_toolchain() {
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 		-t trixie-backports cargo rustc
 	log "rustc: $(rustc --version)"
+	# The pinned justfiles use submodules with module-recipe dependencies
+	# (`clean: cargo::clean`), which trixie's just 1.40 can't parse. A pinned
+	# newer just in /usr/local/bin shadows the distro one mk-build-deps pulls in.
+	if [[ "$(just --version 2>/dev/null)" != "just $JUST_VERSION" ]]; then
+		cargo install --locked --root /usr/local just --version "$JUST_VERSION"
+	fi
+	log "just: $(just --version)"
 }
 
 # Fetch cosmic-epoch once; each component is a submodule pinned by the tag.
@@ -117,6 +126,11 @@ build_component() { # name origin
 	mv ../*.deb "$OUTDIR"/
 	rm -f ../*.buildinfo ../*.changes
 	cd - >/dev/null
+	# Rust build trees run to several GB each; drop them when building many
+	# components on one machine (CI builds one component per runner).
+	if [[ ${CLEAN_AFTER:-0} == 1 ]]; then
+		rm -rf --one-file-system "${dir:?}/target" "${dir:?}/vendor"
+	fi
 }
 
 main() {

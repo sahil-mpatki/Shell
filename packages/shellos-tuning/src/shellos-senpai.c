@@ -20,6 +20,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include <inttypes.h>
+#include <math.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -150,6 +151,27 @@ static void usage(const char *argv0)
 	exit(2);
 }
 
+/*
+ * Parse a whole option argument as a finite number in [lo, hi] (or (lo, hi]
+ * when lo_open). Anything else -- trailing junk, NaN, inf, out of range --
+ * is a usage error: a NaN interval, for one, would make the loop spin.
+ */
+static double parse_num(int opt, const char *s, double lo, double hi, bool lo_open)
+{
+	char *end;
+	double v;
+
+	errno = 0;
+	v = strtod(s, &end);
+	if (errno || end == s || *end || !isfinite(v) ||
+	    v < lo || (lo_open && v == lo) || v > hi) {
+		fprintf(stderr, "-%c: invalid value '%s' (expected %c%g, %g])\n",
+			opt, s, lo_open ? '(' : '[', lo, hi);
+		exit(2);
+	}
+	return v;
+}
+
 int main(int argc, char **argv)
 {
 	double interval = 6.0;      /* seconds between probes          */
@@ -163,18 +185,22 @@ int main(int argc, char **argv)
 
 	while ((opt = getopt(argc, argv, "i:p:r:m:w:nh")) != -1) {
 		switch (opt) {
-		case 'i': interval = strtod(optarg, NULL); break;
-		case 'p': target_pct = strtod(optarg, NULL); break;
-		case 'r': ratio = strtod(optarg, NULL); break;
-		case 'm': max_step = strtoull(optarg, NULL, 10) * MIB; break;
-		case 'w': min_swap_free = strtod(optarg, NULL); break;
+		case 'i': interval = parse_num(opt, optarg, 0.1, 3600, false); break;
+		case 'p': target_pct = parse_num(opt, optarg, 0, 100, true); break;
+		case 'r': ratio = parse_num(opt, optarg, 0, 1, true); break;
+		case 'm': max_step = (uint64_t)parse_num(opt, optarg, 1, 65536, false) * MIB; break;
+		case 'w': min_swap_free = parse_num(opt, optarg, 0, 100, false); break;
 		case 'n': dry_run = true; break;
 		default: usage(argv[0]);
 		}
 	}
-	if (optind >= argc || interval <= 0 || target_pct <= 0 || ratio <= 0)
+	if (optind >= argc)
 		usage(argv[0]);
-	for (; optind < argc && ntargets < MAX_CGROUPS; optind++)
+	if (argc - optind > MAX_CGROUPS) {
+		fprintf(stderr, "at most %d cgroups are supported\n", MAX_CGROUPS);
+		exit(2);
+	}
+	for (; optind < argc; optind++)
 		targets[ntargets++] = (struct target){ .path = argv[optind] };
 
 	signal(SIGTERM, on_signal);
@@ -221,7 +247,9 @@ int main(int argc, char **argv)
 			if (step >= (double)MIB)
 				reclaim(t->path, (uint64_t)step & ~4095ULL, dry_run);
 		}
-		nanosleep(&ts, NULL);
+		/* Sleep the full interval even if a signal interrupts it. */
+		while (nanosleep(&ts, &ts) == -1 && errno == EINTR && !stop)
+			;
 	}
 	return 0;
 }

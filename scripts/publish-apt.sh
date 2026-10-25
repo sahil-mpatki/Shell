@@ -14,8 +14,10 @@
 #   GPG_KEY_ID       signing key, already imported into gpg
 set -euo pipefail
 
-NEW="$1"
-SITE="$2"
+# Absolute paths: the script cd's into the repo to build indices, and the
+# workflow passes relative ones.
+NEW="$(realpath "$1")"
+SITE="$(realpath -m "$2")"
 APT="$SITE/apt"
 POOL="$APT/pool/main"
 DIST="$APT/dists/trixie"

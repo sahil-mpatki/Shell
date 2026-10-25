@@ -9,6 +9,8 @@ live-config
 live-config-systemd
 user-setup
 locales
+# HTTPS apt sources (ShellOS repo, Mozilla) need a trust store
+ca-certificates
 zsh
 sudo
 network-manager

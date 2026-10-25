@@ -4,7 +4,7 @@
 #   vm/shellos-vm live    [ISO]  try the live ISO (no disk attached)
 #   vm/shellos-vm install [ISO]  live ISO + the VM's disk: run "Install ShellOS"
 #   vm/shellos-vm boot           boot the installed disk (Limine menu, snapshots)
-#   vm/shellos-vm smoke   [ISO]  headless boot test over serial; exit 0 = healthy
+#   vm/shellos-vm smoke   [ISO] [--profile P]  headless boot test; exit 0 = healthy
 #   vm/shellos-vm reset          delete the VM's disk and UEFI variables
 #
 # ISO defaults to the newest out/iso/*.iso. Settings (environment):
@@ -144,7 +144,9 @@ case "$cmd" in
 		run_qemu "${DISK_ARGS[@]}"
 		;;
 	smoke)
-		exec python3 "$HERE/smoke.py" "${1:-$(newest_iso)}"
+		iso="${1:-$(newest_iso)}"
+		shift || true
+		exec python3 "$HERE/smoke.py" "$iso" "$@"
 		;;
 	reset)
 		rm -f "$DISK" "$VARS"
