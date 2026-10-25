@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: [kernel, packages, cosmic, tools]
     types: [completed]
-    branches: [shellos-bootstrap]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
