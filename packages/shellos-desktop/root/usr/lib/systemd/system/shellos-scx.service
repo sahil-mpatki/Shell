@@ -2,7 +2,9 @@
 Description=sched_ext BPF CPU scheduler
 Documentation=https://github.com/sahil-mpatki/Shell/blob/main/docs/KERNEL.md
 ConditionPathExists=/sys/kernel/sched_ext
-After=power-profiles-daemon.service
+# No After=power-profiles-daemon: Debian orders that after multi-user.target,
+# which made a cycle and systemd dropped this unit. --autopower asks ppd over
+# D-Bus (activating it on demand) and polls every second, so no ordering is needed.
 StartLimitIntervalSec=120
 StartLimitBurst=3
 
