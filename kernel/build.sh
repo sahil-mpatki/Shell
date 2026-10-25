@@ -37,7 +37,7 @@ log() { printf '\033[1;36m==> %s\033[0m\n' "$*"; }
 die() { printf '\033[1;31mxx  %s\033[0m\n' "$*" >&2; exit 1; }
 
 BUILD_DEPS=(
-	bc bison build-essential cpio curl debhelper dpkg-dev dwarves flex kmod
+	bc bison build-essential ca-certificates cpio curl debhelper dpkg-dev dwarves flex kmod
 	libdw-dev libelf-dev libssl-dev python3 rsync xz-utils zstd
 	"clang$LLVM_SUFFIX" "lld$LLVM_SUFFIX" "llvm$LLVM_SUFFIX"
 )
