@@ -1,0 +1,17 @@
+Source: adw-gtk3
+Section: x11
+Priority: optional
+Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Homepage: https://github.com/lassekongo83/adw-gtk3
+Rules-Requires-Root: no
+
+Package: adw-gtk3
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Description: libadwaita look for GTK3 applications
+ The light and dark adw-gtk3 themes make GTK3 applications match the
+ libadwaita/COSMIC look. COSMIC selects them automatically when it themes
+ GTK applications.

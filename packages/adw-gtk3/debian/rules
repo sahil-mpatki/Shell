@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_auto_install:
+	for t in adw-gtk3 adw-gtk3-dark; do \
+		mkdir -p debian/adw-gtk3/usr/share/themes; \
+		cp -r $$t debian/adw-gtk3/usr/share/themes/; \
+	done

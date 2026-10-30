@@ -5,6 +5,7 @@ on:
     paths:
       - 'packages/shellos-*/**'
       - 'packages/limine/**'
+      - 'packages/adw-gtk3/**'
       - 'scripts/**'
       - '.github/workflows/packages.yml'
   workflow_dispatch:
@@ -37,6 +38,8 @@ jobs:
           mv packages/*.deb out/packages/
       - name: Limine
         run: packages/limine/build.sh
+      - name: adw-gtk3
+        run: packages/adw-gtk3/build.sh
       - uses: actions/upload-artifact@v4
         with:
           name: debs-packages

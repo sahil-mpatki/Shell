@@ -7,7 +7,8 @@
 # workflow whose artifacts have expired doesn't drop its packages. Only the
 # newest version of each package is kept (Pages sites are capped at ~1 GB);
 # -dbg packages are skipped (they go to GitHub Releases instead), as are
-# -dbgsym packages.
+# -dbgsym packages. linux-libc-dev is never published: the repo is pinned
+# above Debian, so ours would replace trixie's userspace kernel headers.
 #
 # Environment:
 #   SHELLOS_APT_URL  live repo to carry packages forward from (optional)
@@ -41,6 +42,8 @@ fi
 
 # --- add new builds ----------------------------------------------------------------
 find "$NEW" -name '*.deb' ! -name '*-dbg_*' ! -name '*-dbgsym_*' -exec cp -f -t "$POOL" {} +
+# Also drops a copy carried forward from before this rule existed.
+rm -f "$POOL"/linux-libc-dev_*.deb
 
 # --- keep only the newest version of each package -------------------------------
 declare -A best_ver best_file
