@@ -84,6 +84,24 @@ fixups() { # name dir
 			sed -i '\#usr/share/apparmor/extra-profiles#d; \#etc/netplan/#d' "$dir/debian/install"
 			! grep -qE 'apparmor|netplan' "$dir/debian/install" \
 				|| die "default-settings: Ubuntu-only file removal no longer applies"
+			# Built but deliberately not packaged (dh_missing would fail).
+			printf '%s\n' etc/netplan/01-network-manager-all.yml \
+				usr/share/apparmor/extra-profiles/bwrap-userns-restrict-patched \
+				>> "$dir/debian/not-installed"
+			;;
+		wingpanel)
+			# wingpanel.pc requires gee-0.8 and gtk+-3.0, but libwingpanel-dev
+			# only depends on GLib's headers (Ubuntu gets the rest indirectly).
+			python3 - "$dir/debian/control" <<-'EOF'
+			import re, sys
+			path = sys.argv[1]
+			paras = open(path).read().split("\n\n")
+			for i, p in enumerate(paras):
+			    if re.search(r"^Package:\s*libwingpanel-dev\s*$", p, re.M):
+			        paras[i] = re.sub(r"^Depends:\n", "Depends:\n libgee-0.8-dev,\n libgtk-3-dev (>= 3.10),\n", p, count=1, flags=re.M)
+			        assert paras[i] != p, "libwingpanel-dev has no Depends field"
+			open(path, "w").write("\n\n".join(paras))
+			EOF
 			;;
 	esac
 }

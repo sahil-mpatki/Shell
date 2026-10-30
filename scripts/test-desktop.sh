@@ -24,6 +24,11 @@ fail() { printf '  FAIL  %s\n' "$*"; FAILED=1; }
 
 # --- a ShellOS-like system --------------------------------------------------------
 log "Setting up apt sources"
+# ShellOS uses all of Debian's components (firmware, microcode, Intel media
+# driver); the debian:trixie image enables only main.
+sed -i 's/^Components: main$/Components: main contrib non-free non-free-firmware/' \
+	/etc/apt/sources.list.d/debian.sources
+grep -q non-free-firmware /etc/apt/sources.list.d/debian.sources
 apt-get update
 apt-get install -y --no-install-recommends ca-certificates curl gnupg
 install -Dm644 "$REPO/iso/keys/packages.mozilla.org.asc" /etc/apt/keyrings/packages.mozilla.org.asc
