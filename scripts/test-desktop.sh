@@ -20,6 +20,16 @@ FAILED=0
 
 log() { printf '\033[1;36m==> %s\033[0m\n' "$*"; }
 pass() { printf '  PASS  %s\n' "$*"; }
+# GitHub Pages can serve a half-updated index while publish runs; retry.
+apt_update() {
+	local i
+	for i in 1 2 3 4 5; do
+		apt-get update && return 0
+		echo "apt-get update failed (attempt $i), retrying in 30 s"
+		sleep 30
+	done
+	return 1
+}
 fail() { printf '  FAIL  %s\n' "$*"; FAILED=1; }
 
 # --- a ShellOS-like system --------------------------------------------------------
@@ -29,7 +39,7 @@ log "Setting up apt sources"
 sed -i 's/^Components: main$/Components: main contrib non-free non-free-firmware/' \
 	/etc/apt/sources.list.d/debian.sources
 grep -q non-free-firmware /etc/apt/sources.list.d/debian.sources
-apt-get update
+apt_update
 apt-get install -y --no-install-recommends ca-certificates curl gnupg
 install -Dm644 "$REPO/iso/keys/packages.mozilla.org.asc" /etc/apt/keyrings/packages.mozilla.org.asc
 curl -fsSL "$SHELLOS_APT_URL/shellos-archive.asc" -o /etc/apt/keyrings/shellos-archive.asc
@@ -47,7 +57,7 @@ Components: main
 Signed-By: /etc/apt/keyrings/packages.mozilla.org.asc
 EOF
 printf 'Package: *\nPin: origin sahil-mpatki.github.io\nPin-Priority: 900\n' > /etc/apt/preferences.d/shellos
-apt-get update
+apt_update
 
 log "Installing the ShellOS base with COSMIC (the live image's set)"
 apt-get install -y shellos-desktop shellos-de-cosmic
@@ -90,7 +100,11 @@ case "$ID" in
 	hyprland)
 		[[ -f /home/tester/.config/hypr/hyprland.lua ]] && pass "existing user got hyprland.lua" \
 			|| fail "existing user has no hyprland.lua"
-		out="$(XDG_RUNTIME_DIR="$(mktemp -d)" runuser -u tester -- Hyprland --verify-config \
+		# Hyprland carries file capabilities (cap_sys_nice) that a container's
+		# bounding set refuses at exec; a plain copy has none and parses the same.
+		cp /usr/bin/Hyprland /usr/local/bin/hyprland-verify
+		rt="$(mktemp -d)"; chown tester "$rt"
+		out="$(XDG_RUNTIME_DIR="$rt" runuser -u tester -- /usr/local/bin/hyprland-verify --verify-config \
 			-c /home/tester/.config/hypr/hyprland.lua 2>&1 || true)"
 		grep -q "config ok" <<<"$out" && pass "Hyprland config verifies" \
 			|| { fail "Hyprland config"; echo "$out" | tail -5; }

@@ -1,7 +1,8 @@
 # Pantheon (elementary OS 8) components rebuilt for Debian trixie.
 # <github.com/elementary repo>  <stage>  <release>  <source commit>  <packaging commit>
 # Source is the release tag's commit; packaging is the deb-packaging branch
-# commit whose changelog is that release (the branch head often runs ahead).
+# commit that introduced that release's changelog entry (later commits on the
+# branch can already target the next release, e.g. the GTK4 ports).
 # Stage: 1 = granite, pantheon-wayland (trixie's granite is too old for the
 # rest), 2 = needs stage 1 (gala, switchboard, apps), 3 = needs gala or
 # switchboard (wingpanel, plugs; pantheon-wayland's library depends on gala),
@@ -45,13 +46,13 @@ switchboard-plug-sound             3  8.0.3  7d522d2045d1b0f1bfbd7e86ea4df55661e
 switchboard-plug-useraccounts      3  8.0.1  49a4032a761885599e7309b0fd76d55bf1a0c773 781e637c6411998797a9bb0233cc46d3ff0cc2c1
 switchboard-plug-wacom             3  8.0.2  237693e948292dab61458ba7a16eb4db6e823432 3190f5582965d018f80b8ed65fdcbad11bb18044
 wingpanel                          3  8.0.4  cb055fd0749034965f05c17d40fff80a9e5b9c25 9db00f19fce6d5714f547bf3b8509485c4591ee6
-applications-menu                  4  8.0.4  eb1416985bea6eea43cdcc84a4aea4cc8498134a 9d1506f624e7703bade2100281b76070655b0c28
+applications-menu                  4  8.0.4  eb1416985bea6eea43cdcc84a4aea4cc8498134a 184a5be8190000f10ea590664c251cd975172aac
 quick-settings                     4  1.4.0  78d5e405e53907dd108f9ab71fb319624a8df558 70832be32f46d01c1381f141a717b4ab92a49a34
-wingpanel-indicator-bluetooth      4  8.0.0  7bc59f1f9d8710c28d64ca951d7ca1d558bbfc18 c531676ab5d2af7eae956007b7dd3b3d3ad3a78e
-wingpanel-indicator-datetime       4  2.4.2  f5fad6090a599f97cbf31335f1a4c654faf23780 5b00696571985c62f5beadb27152d264d0e6cd35
-wingpanel-indicator-keyboard       4  2.4.2  bae22dd013703dbc534aba691106cb3259726715 0cc55295be9dbbced12dc2cb6d3301c7020d67af
-wingpanel-indicator-network        4  8.0.1  3071b9ac837b83773cc386501371dcec923154fc 2d7119ba41fe9b869e9a671f74e1a86060fcd53c
-wingpanel-indicator-nightlight     4  2.1.3  70922bc5986efde49b97a8ba8e7301c7bb4c1a67 5aec18ef4b586cb2549c6d59208b3d51167ec1ff
-wingpanel-indicator-notifications  4  7.1.1  564089f9b7e9a8a664e3d1fe3a87e7e21786c480 58705df48c25333ba7463465821de1c55b6dd758
-wingpanel-indicator-power          4  8.0.2  4aaf2fda76cbf09b953fe916cb1480a0a715b780 889dce089a43e753da0c27313e45a07d49243f49
-wingpanel-indicator-sound          4  8.0.3  8114866d425043e7e77ffc942edfb76493550c15 9fac78662dccafaedfc507f434e3fa14b3c1129f
+wingpanel-indicator-bluetooth      4  8.0.0  7bc59f1f9d8710c28d64ca951d7ca1d558bbfc18 529232b17c9372b77401497a734d0c639ceedfa9
+wingpanel-indicator-datetime       4  2.4.2  f5fad6090a599f97cbf31335f1a4c654faf23780 d3ba5958868c7ec884f742ff9a0b62b366c1988d
+wingpanel-indicator-keyboard       4  2.4.2  bae22dd013703dbc534aba691106cb3259726715 b94260ef3927084003e84081d685f04524717384
+wingpanel-indicator-network        4  8.0.1  3071b9ac837b83773cc386501371dcec923154fc a2529e9031084d0f3eb77414bc55f1b89bf5588d
+wingpanel-indicator-nightlight     4  2.1.3  70922bc5986efde49b97a8ba8e7301c7bb4c1a67 a45bac6797b5f7953977f92d485c8c262641efe0
+wingpanel-indicator-notifications  4  7.1.1  564089f9b7e9a8a664e3d1fe3a87e7e21786c480 e8c491ea084c8dfd63b2e3c9d9af8be8149c00eb
+wingpanel-indicator-power          4  8.0.2  4aaf2fda76cbf09b953fe916cb1480a0a715b780 0579b279b96696834666814c6875bc63ee2269cf
+wingpanel-indicator-sound          4  8.0.3  8114866d425043e7e77ffc942edfb76493550c15 f1f532e11044a2b04616f6f8f19edd78ece7c7c6

@@ -33,7 +33,8 @@ if [[ -n ${SHELLOS_APT_URL:-} ]]; then
 	if live="$(curl -fsSL "$SHELLOS_APT_URL/dists/trixie/main/binary-amd64/Packages.gz" | gunzip)"; then
 		log "Carrying forward live packages from $SHELLOS_APT_URL"
 		sed -n 's/^Filename: //p' <<<"$live" | while read -r f; do
-			curl -fsSLo "$POOL/$(basename "$f")" "$SHELLOS_APT_URL/$f"
+			curl -fsSL --retry 5 --retry-all-errors --retry-delay 5 \
+				-o "$POOL/$(basename "$f")" "$SHELLOS_APT_URL/$f"
 		done
 	else
 		log "No live repo yet at $SHELLOS_APT_URL"
