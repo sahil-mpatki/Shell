@@ -18,6 +18,8 @@ set -euo pipefail
 # Absolute paths: the script cd's into the repo to build indices, and the
 # workflow passes relative ones.
 NEW="$(realpath "$1")"
+# Before any cd: BASH_SOURCE may be relative to the starting directory.
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SITE="$(realpath -m "$2")"
 APT="$SITE/apt"
 POOL="$APT/pool/main"
@@ -83,7 +85,6 @@ gpg --armor --export "$GPG_KEY_ID" > shellos-archive.asc
 # --- website ------------------------------------------------------------------------
 # The project site (web/) at the root, with the logo generated from the same
 # script as the OS artwork, so the two never drift apart.
-REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cp -a "$REPO/web/." "$SITE/"
 python3 "$REPO/packages/shellos-branding/art/generate.py" "$SITE/art" >/dev/null
 log "Repository ready in $APT"
