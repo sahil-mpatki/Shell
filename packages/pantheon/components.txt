@@ -1,0 +1,56 @@
+# Pantheon (elementary OS 8) components rebuilt for Debian trixie.
+# <github.com/elementary repo>  <stage>  <release>  <source commit>  <packaging commit>
+# Source is the release tag's commit; packaging is the deb-packaging branch
+# commit whose changelog is that release (the branch head often runs ahead).
+# Stage: 1 = granite, pantheon-wayland (trixie's granite is too old for the
+# rest), 2 = needs stage 1 (gala, switchboard, apps), 3 = needs gala or
+# switchboard (wingpanel, plugs), 4 = needs wingpanel. Update deliberately.
+granite                            1  7.8.1  4cd5188619e65f2f2410c9af834df903f6e4f85e 3a76a32365b537f771e48a42bd63b78b366e8a14
+pantheon-wayland                   1  1.1.0  08e7f25928c16e2a238054d9904a93dcf519a7e0 818bd71fa3363a85f61185759e6233cb309051e2
+bluetooth-daemon                   2  1.1.0  812cd1cd9f507b3de9487d3d6c59b0f339e018a7 41e540f64fcbd98b5e25760c38e5cfa3967b5dc7
+code                               2  8.4.0  346a538376f5c5c7a8e95977838a1512bb637491 e779121a1e801a025507f431e21e27ed1519e9b5
+default-settings                   2  8.1.1  517bf7fd43188fcaa079cc043e1cfdd172ecb327 1057412902b4197edb38e2d9a1cf1f722f6cbe0f
+dock                               2  8.3.3  8b45a68a122947ad3a6427bf6e159ec2acf04ad0 b423a974112c40661ae4a981a046ed2e17672d56
+files                              2  7.3.3  ddb727f59d53cfc41815f430caab0a2cb580903c fa826ad7b53e43de50903f791dcb257c91eb530e
+gala                               2  8.6.2  038ca7adcbfdbc2a95ff9deefd63a3050cb10181 b99eb679d3eeb40870c3720cddbd3ddf1a3c2d62
+icons                              2  9.0.0  31c7285a1d10170abd363a2553a7f377a031bb33 9d3e9ada4bf40b40234b7af26b3b64203defdebc
+notifications                      2  8.1.2  0fbd2fb200dfac6489df8af1ca5b174abfe831cd a381ca0248a3de46bcc91d6e7cabb436f385a666
+pantheon-agent-polkit              2  8.1.0  ed4d4c72d7757c8c8371b565ae86c3968a038e02 fc6d5955bc055340682843419b4d40a485497a54
+portals                            2  8.2.0  ac3464d7d1834aded91342bdabb3a24f99c7d980 b8f28825260b45374c6b6d2d0341e6047b0725aa
+session-settings                   2  8.1.0  7d66efddcd48d2ab02d53cf13f37bb52e6abaca9 c55090e9c86c3e703f48c1f220f6101c7d9323b5
+settings-daemon                    2  8.5.0  19b2829f949b5b31ea98baf95a776c36a8761ebc 3d5fc2b07520f1e1e14095d693b9a32663ae9911
+shortcut-overlay                   2  8.1.0  f831f994c36295fb236cf87c722cf733f43d32eb 4e1a1c9197ca1ad290d3a80dc12ed062566fb706
+sound-theme                        2  1.1.0  88cb3a325995fcd5fe123f189062e3efb69972ca cdb77a51c7f94bed9c94493912ef3134917a50f9
+stylesheet                         2  8.2.2  9cfb767873d583f6ed29e96cf27728bb69fd9237 8c15f6cc3eeff14f1545376f8e0a59dcde6a23de
+switchboard                        2  8.0.3  6714b3c8f6d0e6d386c3190e1c15b1d651faae2a 6967002019d8ab55cf5e7142a097549fe9381660
+terminal                           2  8.1.0  c7870e057815f9fee5086e7a822afc0bb14b229a d86d65b7b418a6f8704e1de551aad8f74003d102
+wallpapers                         2  8.0.0  2ae7f028a7d807864bdc6b28947d5eb3f36add61 ba8b274cbb0afeda198a62007480ce89d00052f1
+switchboard-plug-about             3  8.2.3  162ee57ea1c77ccb89ce08c5eb72e68a5b3b44e5 9a4b6d326a15320e2741357fe6d912d24ee5742c
+switchboard-plug-applications      3  8.3.0  7a3db68680295c37e8baabd9812bb2df11f10fc8 807361037c345a7373524a5380243ee8cb8b049b
+switchboard-plug-bluetooth         3  8.0.2  d2f070d5fe8367c6a6a98f4ca79027b5367f3ee1 7028bf7c0205689cb17ddee30755a3dee88e3628
+switchboard-plug-datetime          3  8.1.0  763dc18bba6008722b6ee4106d7c98bf17ea458d 32843645ea3ea5209d7dd707537da99733dbceb6
+switchboard-plug-display           3  8.0.3  dfc173e07e023ae19f19f96aa8e40fe5ef44f593 f3fd051241b27a43fae6523afaa42712c2c23a12
+switchboard-plug-keyboard          3  8.1.1  8243a1b2b37c4307dab4933837f11c74b1d3b65d ecef0d6094cfbddf5b8d79c4b7e061ed80dc01cc
+switchboard-plug-locale            3  8.0.3  2e53c289a6e6d0c0a433e40b01c5c747a9c6c267 3377052ce207e043c46fc3bb0c5408bbeb660ff3
+switchboard-plug-mouse-touchpad    3  8.1.0  0309d2bc29ce40922987e62cf53d780fceff8235 ba71dddce5b5d65e723e334844e11d20794f2a8e
+switchboard-plug-network           3  8.2.0  6183aff9ad8def721840ee6b00f70e0eb78e58bd 7185429e7be13da85fa94c847d813e247a5c255a
+switchboard-plug-notifications     3  8.0.1  574e5836cfeb8f36763733f8c64eabbb5de5d7d0 7538e51743f0a4bfb4758e52e6e0bd2ae2c67d66
+switchboard-plug-pantheon-shell    3  8.3.0  ee68ac1ca4d905ea7b59febd26396e5a2035bf7b 0936bb2b194541528f591083a52d003f415f9ff1
+switchboard-plug-power             3  8.1.0  4d12d0f7135102bba39250955111b0b190c7af6b 1b4acdac5e8f5f2c1ee1869b72d5017866654390
+switchboard-plug-printers          3  8.0.2  96f7b71d79a878de099574ecbefe31ecc25a7171 6e9784ca8da1bdefbb6a20957f3a824bd8394fd1
+switchboard-plug-security-privacy  3  8.0.2  3c697f501177f129e2c30744b8287e30e8524166 75697fdbc1e6480a3d9a87a92a8caf5b9a1d83f7
+switchboard-plug-sharing           3  8.0.3  8ac4bd21132251924a3d4ad83e3be0fae087b624 1fa3cea947882b4c1dc8889e5d12ffa4ed944bbd
+switchboard-plug-sound             3  8.0.3  7d522d2045d1b0f1bfbd7e86ea4df55661e4c865 1cf0917f300dd51bfecfb37937e0f45b1ec6769f
+switchboard-plug-useraccounts      3  8.0.1  49a4032a761885599e7309b0fd76d55bf1a0c773 781e637c6411998797a9bb0233cc46d3ff0cc2c1
+switchboard-plug-wacom             3  8.0.2  237693e948292dab61458ba7a16eb4db6e823432 3190f5582965d018f80b8ed65fdcbad11bb18044
+wingpanel                          3  8.0.4  cb055fd0749034965f05c17d40fff80a9e5b9c25 9db00f19fce6d5714f547bf3b8509485c4591ee6
+applications-menu                  4  8.0.4  eb1416985bea6eea43cdcc84a4aea4cc8498134a 9d1506f624e7703bade2100281b76070655b0c28
+quick-settings                     4  1.4.0  78d5e405e53907dd108f9ab71fb319624a8df558 70832be32f46d01c1381f141a717b4ab92a49a34
+wingpanel-indicator-bluetooth      4  8.0.0  7bc59f1f9d8710c28d64ca951d7ca1d558bbfc18 c531676ab5d2af7eae956007b7dd3b3d3ad3a78e
+wingpanel-indicator-datetime       4  2.4.2  f5fad6090a599f97cbf31335f1a4c654faf23780 5b00696571985c62f5beadb27152d264d0e6cd35
+wingpanel-indicator-keyboard       4  2.4.2  bae22dd013703dbc534aba691106cb3259726715 0cc55295be9dbbced12dc2cb6d3301c7020d67af
+wingpanel-indicator-network        4  8.0.1  3071b9ac837b83773cc386501371dcec923154fc 2d7119ba41fe9b869e9a671f74e1a86060fcd53c
+wingpanel-indicator-nightlight     4  2.1.3  70922bc5986efde49b97a8ba8e7301c7bb4c1a67 5aec18ef4b586cb2549c6d59208b3d51167ec1ff
+wingpanel-indicator-notifications  4  7.1.1  564089f9b7e9a8a664e3d1fe3a87e7e21786c480 58705df48c25333ba7463465821de1c55b6dd758
+wingpanel-indicator-power          4  8.0.2  4aaf2fda76cbf09b953fe916cb1480a0a715b780 889dce089a43e753da0c27313e45a07d49243f49
+wingpanel-indicator-sound          4  8.0.3  8114866d425043e7e77ffc942edfb76493550c15 9fac78662dccafaedfc507f434e3fa14b3c1129f

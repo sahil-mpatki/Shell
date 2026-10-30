@@ -1,0 +1,129 @@
+name: pantheon
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/pantheon/**'
+      - '.github/workflows/pantheon.yml'
+  workflow_dispatch:
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs:
+      s1: ${{ steps.list.outputs.s1 }}
+      s2: ${{ steps.list.outputs.s2 }}
+      s3: ${{ steps.list.outputs.s3 }}
+      s4: ${{ steps.list.outputs.s4 }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: |
+          for s in 1 2 3 4; do
+            echo "s$s=$(packages/pantheon/build.sh --list $s | jq -Rnc '[inputs]')" >> "$GITHUB_OUTPUT"
+          done
+
+  # Stage 1: granite, pantheon-wayland (built against trixie only).
+  stage1:
+    needs: list
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    strategy:
+      fail-fast: false
+      matrix:
+        component: ${{ fromJSON(needs.list.outputs.s1) }}
+    env:
+      CI_REV: ${{ github.run_number }}
+    steps:
+      - run: apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v4
+      - run: packages/pantheon/build.sh ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debs-pantheon-${{ matrix.component }}
+          path: out/packages/*.deb
+          retention-days: 90
+
+  # Stage 2: everything that needs only stage 1 (gala, switchboard, apps).
+  stage2:
+    needs: [list, stage1]
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        component: ${{ fromJSON(needs.list.outputs.s2) }}
+    env:
+      CI_REV: ${{ github.run_number }}
+      LOCAL_DEBS: local-debs
+    steps:
+      - run: apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: debs-pantheon-*
+          path: local-debs
+          merge-multiple: true
+      - run: packages/pantheon/build.sh ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debs-pantheon-${{ matrix.component }}
+          path: out/packages/*.deb
+          retention-days: 90
+
+  # Stage 3: wingpanel (needs gala) and the switchboard plugs.
+  stage3:
+    needs: [list, stage2]
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        component: ${{ fromJSON(needs.list.outputs.s3) }}
+    env:
+      CI_REV: ${{ github.run_number }}
+      LOCAL_DEBS: local-debs
+    steps:
+      - run: apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: debs-pantheon-*
+          path: local-debs
+          merge-multiple: true
+      - run: packages/pantheon/build.sh ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debs-pantheon-${{ matrix.component }}
+          path: out/packages/*.deb
+          retention-days: 90
+
+  # Stage 4: wingpanel indicators, quick settings, applications menu.
+  stage4:
+    needs: [list, stage3]
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        component: ${{ fromJSON(needs.list.outputs.s4) }}
+    env:
+      CI_REV: ${{ github.run_number }}
+      LOCAL_DEBS: local-debs
+    steps:
+      - run: apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: debs-pantheon-*
+          path: local-debs
+          merge-multiple: true
+      - run: packages/pantheon/build.sh ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debs-pantheon-${{ matrix.component }}
+          path: out/packages/*.deb
+          retention-days: 90

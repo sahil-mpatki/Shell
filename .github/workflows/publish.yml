@@ -2,7 +2,7 @@ name: publish
 # Rebuild the signed apt repo on GitHub Pages whenever a package build finishes.
 on:
   workflow_run:
-    workflows: [kernel, packages, cosmic, tools]
+    workflows: [kernel, packages, cosmic, tools, pantheon]
     types: [completed]
     branches: [main]
   workflow_dispatch:
@@ -41,7 +41,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p new
-          for wf in kernel packages cosmic tools; do
+          for wf in kernel packages cosmic tools pantheon; do
             id=$(gh run list -R "$GITHUB_REPOSITORY" --workflow "$wf.yml" --branch "${{ github.event.repository.default_branch }}" \
                  --status completed -L 1 --json databaseId -q '.[0].databaseId')
             if [ -n "$id" ]; then
