@@ -1,5 +1,7 @@
 # Live/installed system for the "desktop" ISO profile.
 shellos-desktop
+# the live session's desktop; the installer offers the others
+shellos-de-cosmic
 shellos-installer
 # live session
 live-boot

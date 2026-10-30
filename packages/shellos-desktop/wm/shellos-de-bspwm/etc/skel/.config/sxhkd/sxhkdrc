@@ -1,0 +1,55 @@
+# ShellOS bspwm keys. Same core keys as ShellOS's Hyprland, i3 and dwm:
+#   Super+Return terminal   Super+D apps   Super+Q close   Super+F fullscreen
+#   Super+Space float       Super+1..9 / Super+Shift+1..9 desktops
+#   Super+H/J/K/L focus     Super+Shift+H/J/K/L swap
+#   Super+Escape lock       Super+Shift+E exit   Print screenshot
+super + Return
+	alacritty
+super + d
+	rofi -show drun
+super + b
+	firefox
+super + q
+	bspc node -c
+super + Escape
+	shellos-lock
+super + shift + e
+	bspc quit
+super + shift + r
+	bspc wm -r; pkill -USR1 -x sxhkd
+Print
+	maim -s | xclip -selection clipboard -t image/png
+shift + Print
+	mkdir -p ~/Pictures && maim ~/Pictures/screenshot-$(date +%F-%H%M%S).png
+
+super + f
+	bspc node -t ~fullscreen
+super + space
+	bspc node -t ~floating
+super + t
+	bspc desktop -l next
+super + {h,j,k,l}
+	bspc node -f {west,south,north,east}
+super + {Left,Down,Up,Right}
+	bspc node -f {west,south,north,east}
+super + shift + {h,j,k,l}
+	bspc node -s {west,south,north,east}
+super + shift + {Left,Down,Up,Right}
+	bspc node -s {west,south,north,east}
+super + {1-9}
+	bspc desktop -f '^{1-9}'
+super + shift + {1-9}
+	bspc node -d '^{1-9}' --follow
+super + alt + {h,j,k,l}
+	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+
+XF86AudioRaiseVolume
+	wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+
+XF86AudioLowerVolume
+	wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+XF86AudioMute
+	wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+XF86Audio{Play,Next,Prev}
+	playerctl {play-pause,next,previous}
+XF86MonBrightness{Up,Down}
+	brightnessctl set 5%{+,-}

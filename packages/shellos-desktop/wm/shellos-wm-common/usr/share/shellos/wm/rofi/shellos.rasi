@@ -1,0 +1,36 @@
+/* ShellOS launcher theme: deep sea background, teal accent. */
+* {
+    bg:        #0B1416F2;
+    surface:   #14201F;
+    fg:        #E6F4F2;
+    muted:     #6B8783;
+    accent:    #2EC4B6;
+    selected:  #1A4F4A;
+    background-color: transparent;
+    text-color: @fg;
+    font: "JetBrains Mono 11";
+}
+window {
+    width: 38%;
+    background-color: @bg;
+    border: 2px;
+    border-color: @accent;
+    border-radius: 12px;
+    padding: 14px;
+}
+mainbox { spacing: 10px; children: [ inputbar, listview ]; }
+inputbar {
+    background-color: @surface;
+    border-radius: 8px;
+    padding: 10px 12px;
+    spacing: 8px;
+    children: [ prompt, entry ];
+}
+prompt { text-color: @accent; }
+entry { placeholder: "Search"; placeholder-color: @muted; }
+listview { lines: 8; columns: 1; spacing: 4px; scrollbar: false; }
+element { padding: 8px 10px; border-radius: 8px; spacing: 10px; }
+element selected.normal { background-color: @selected; }
+element-icon { size: 22px; }
+element-text { vertical-align: 0.5; }
+element-text selected { text-color: @fg; }

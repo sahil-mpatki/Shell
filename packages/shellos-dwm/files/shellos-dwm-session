@@ -1,0 +1,5 @@
+#!/bin/sh
+# ShellOS dwm session: shared X11 services, a status line, then dwm.
+/usr/lib/shellos/wm/x11-autostart
+shellos-dwm-status &
+exec dwm

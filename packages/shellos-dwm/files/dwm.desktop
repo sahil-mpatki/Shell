@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=dwm
+Comment=Dynamic window manager (ShellOS configuration)
+Exec=/usr/bin/shellos-dwm-session
+Type=Application
+DesktopNames=dwm

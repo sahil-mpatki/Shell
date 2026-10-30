@@ -40,6 +40,11 @@ jobs:
         run: packages/limine/build.sh
       - name: adw-gtk3
         run: packages/adw-gtk3/build.sh
+      - name: dwm (ShellOS config)
+        run: |
+          apt-get install -y --no-install-recommends libx11-dev libxft-dev libxinerama-dev \
+            libfontconfig-dev libfreetype-dev
+          packages/shellos-dwm/build.sh
       - uses: actions/upload-artifact@v4
         with:
           name: debs-packages

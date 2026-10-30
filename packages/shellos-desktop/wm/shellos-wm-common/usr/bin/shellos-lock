@@ -1,0 +1,6 @@
+#!/bin/sh
+# Lock the screen in ShellOS colours (Wayland: hyprlock, X11: i3lock).
+if [ -n "$WAYLAND_DISPLAY" ] && command -v hyprlock >/dev/null; then
+	exec hyprlock
+fi
+exec i3lock --nofork --ignore-empty-password --show-failed-attempts --color=0B1416 "$@"

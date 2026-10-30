@@ -1,0 +1,22 @@
+name: desktops
+# Install every desktop the way the installer does (shellos-desktops set) in
+# a fresh trixie container against the published repo, and check it.
+on:
+  workflow_run:
+    workflows: [publish]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    strategy:
+      fail-fast: false
+      matrix:
+        desktop: [cosmic, pantheon, gnome, kde, hyprland, i3, dwm, bspwm]
+    steps:
+      - uses: actions/checkout@v4
+      - run: scripts/test-desktop.sh ${{ matrix.desktop }}

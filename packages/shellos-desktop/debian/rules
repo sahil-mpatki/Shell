@@ -1,10 +1,16 @@
 #!/usr/bin/make -f
+# root/ is the base package; wm/<package>/ holds each desktop package's files.
+WM_PACKAGES = $(notdir $(wildcard wm/*))
+
 %:
 	dh $@
 
 override_dh_auto_install:
 	mkdir -p debian/shellos-desktop
 	cp -a root/. debian/shellos-desktop/
+	for p in $(WM_PACKAGES); do \
+		mkdir -p debian/$$p && cp -a wm/$$p/. debian/$$p/; \
+	done
 
 override_dh_installsystemd:
-	dh_installsystemd shellos-scx.service
+	dh_installsystemd -pshellos-desktop shellos-scx.service

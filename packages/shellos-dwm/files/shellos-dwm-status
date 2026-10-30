@@ -1,0 +1,13 @@
+#!/bin/sh
+# dwm status line: volume, memory, battery, date. Refreshes every 5 s.
+while xsetroot -name "$(
+	vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{printf "vol %d%%", $2*100} /MUTED/{print " muted"}')
+	mem=$(free | awk '/^Mem:/{printf "mem %d%%", $3*100/$2}')
+	bat=""
+	for b in /sys/class/power_supply/BAT*; do
+		[ -r "$b/capacity" ] && bat="bat $(cat "$b/capacity")%  "
+	done
+	printf ' %s  %s  %s%s ' "$vol" "$mem" "$bat" "$(date '+%a %d %b  %H:%M')"
+)"; do
+	sleep 5
+done

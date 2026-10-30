@@ -1,0 +1,12 @@
+/* ShellOS Waybar: deep sea background, teal accent. */
+* { font-family: "JetBrains Mono", monospace; font-size: 13px; min-height: 0; }
+window#waybar { background: rgba(11, 20, 22, 0.92); color: #E6F4F2; border-bottom: 1px solid #14201F; }
+#workspaces button { padding: 0 8px; color: #6B8783; background: transparent; border-radius: 6px; }
+#workspaces button.active { color: #0B1416; background: #2EC4B6; }
+#workspaces button.urgent { color: #0B1416; background: #FF6B6B; }
+#window { color: #E6F4F2; }
+#tray, #pulseaudio, #network, #cpu, #memory, #battery, #clock { padding: 0 8px; }
+#clock { color: #2EC4B6; }
+#battery.warning { color: #FFD166; }
+#battery.critical, #pulseaudio.muted, #network.disconnected { color: #FF6B6B; }
+tooltip { background: #14201F; border: 1px solid #2EC4B6; border-radius: 8px; }

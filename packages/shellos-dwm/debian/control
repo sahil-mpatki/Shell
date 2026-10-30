@@ -1,0 +1,20 @@
+Source: shellos-dwm
+Section: x11
+Priority: optional
+Maintainer: Sahil Patki <161210761+sahil-mpatki@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13), libx11-dev, libxft-dev, libxinerama-dev,
+ libfontconfig-dev, libfreetype-dev
+Standards-Version: 4.7.0
+Homepage: https://dwm.suckless.org/
+Rules-Requires-Root: no
+
+Package: shellos-dwm
+Architecture: amd64
+Depends: ${misc:Depends}, ${shlibs:Depends}, x11-xserver-utils, procps, wireplumber
+Provides: dwm, x-window-manager
+Conflicts: dwm
+Replaces: dwm
+Description: dwm with the ShellOS configuration
+ suckless dwm built with ShellOS's config.h: Super-key bindings shared with
+ ShellOS's Hyprland, i3 and bspwm, the ShellOS colours, rofi as launcher and
+ Alacritty as terminal, plus a session that starts the ShellOS X11 services.

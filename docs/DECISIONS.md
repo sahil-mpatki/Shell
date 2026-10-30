@@ -59,6 +59,15 @@ Details and citations: [KERNEL.md](KERNEL.md).
 | 27 | Browser | **Firefox from Mozilla's apt repo** | owner |
 | 28 | Extra apps | **Flatpak + Flathub, Distrobox + Podman** | owner |
 | 29 | Look | **dark, minimal, teal `#2EC4B6`**, geometric spiral-shell logo | owner |
+| 35 | More desktops | **Pantheon, GNOME, KDE, Hyprland, i3, dwm, bspwm**, chosen in the installer | owner |
+| 36 | Getting them | **downloaded during install** (ISO stays COSMIC-only) | owner |
+| 37 | How many | **several, picked at a shared login screen** (COSMIC's greeter) | owner |
+| 38 | Tiling WMs | **ShellOS-configured**, same keys across all four | owner |
+| 39 | GNOME / KDE | **core** (`gnome-core`, `kde-plasma-desktop`) | owner |
+| 40 | Pantheon source | elementary OS 8 releases + elementary's packaging, rebuilt for trixie | delegated, following 35 |
+| 41 | Hyprland source | Debian trixie-backports (0.55), pinned to just its own stack | delegated, following 35 |
+| 42 | GTK3 theme | **adw-gtk3** packaged, so GTK3 apps match COSMIC | owner |
+| 43 | Kernel headers | `linux-libc-dev` from the kernel build is **not** published | owner |
 
 ## Infrastructure
 

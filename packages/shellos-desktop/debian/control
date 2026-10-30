@@ -10,10 +10,12 @@ Package: shellos-desktop
 Architecture: all
 Depends: ${misc:Depends},
  shellos-tuning, shellos-boot, shellos-branding, shellos-kernel-tools, linux-shellos,
-# COSMIC desktop (rebuilt for trixie by ShellOS CI)
- cosmic-session, cosmic-greeter, cosmic-files, cosmic-settings, cosmic-store,
- cosmic-edit, cosmic-player, xdg-desktop-portal-cosmic, xdg-desktop-portal-gtk,
- xwayland, gnome-keyring, libpam-gnome-keyring, switcheroo-control,
+# At least one desktop; the installer adds the ones you pick
+ shellos-de-cosmic | shellos-de-pantheon | shellos-de-gnome | shellos-de-kde
+  | shellos-de-hyprland | shellos-de-i3 | shellos-de-dwm | shellos-de-bspwm,
+# Shared login screen for every desktop (lists Wayland and X11 sessions)
+ cosmic-greeter,
+ xdg-desktop-portal-gtk, gnome-keyring, libpam-gnome-keyring, switcheroo-control, adw-gtk3,
 # CPU scheduler userspace
  scx-scheds,
 # Intel Alder/Raptor Lake: microcode, GPU, Wi-Fi, audio DSP, thermals
@@ -29,8 +31,105 @@ Depends: ${misc:Depends},
  snapper, btrfs-assistant,
 # Fonts
  fonts-jetbrains-mono, fonts-noto-core, fonts-noto-color-emoji
-Description: ShellOS desktop (COSMIC) and everything it ships with
- Pulls in the ShellOS kernel, tuning and boot integration, the COSMIC
- desktop, Intel hybrid-CPU firmware and drivers, the sched_ext LAVD
+Description: ShellOS base desktop system
+ Pulls in the ShellOS kernel, tuning and boot integration, the shared login
+ screen, Intel hybrid-CPU firmware and drivers, the sched_ext LAVD
  scheduler, and the default user environment (zsh + starship, Alacritty,
- Firefox, Flatpak with Flathub, Distrobox).
+ Firefox, Flatpak with Flathub, Distrobox). The desktops themselves are the
+ shellos-de-* packages.
+
+Package: shellos-de-cosmic
+Architecture: all
+Depends: ${misc:Depends}, shellos-desktop,
+ cosmic-session, cosmic-files, cosmic-settings, cosmic-store, cosmic-edit,
+ cosmic-player, xdg-desktop-portal-cosmic, xwayland
+Description: ShellOS desktop: COSMIC
+ System76's COSMIC desktop, rebuilt for Debian trixie by ShellOS.
+
+Package: shellos-de-pantheon
+Architecture: all
+Depends: ${misc:Depends}, shellos-desktop,
+ gala, io.elementary.wingpanel, io.elementary.dock, io.elementary.applications-menu,
+ io.elementary.quick-settings, io.elementary.notifications, io.elementary.settings-daemon,
+ io.elementary.portals, pantheon-agent-polkit, pantheon-xsession-settings,
+ elementary-default-settings, io.elementary.stylesheet, elementary-icon-theme,
+ io.elementary.sound-theme, elementary-wallpapers, io.elementary.shortcut-overlay,
+ io.elementary.bluetooth-daemon,
+ io.elementary.panel.bluetooth, io.elementary.panel.datetime, io.elementary.panel.keyboard,
+ io.elementary.panel.network, io.elementary.panel.nightlight,
+ io.elementary.panel.notifications, io.elementary.panel.power, io.elementary.panel.sound,
+ io.elementary.settings, io.elementary.settings.system, io.elementary.settings.applications,
+ io.elementary.settings.bluetooth, io.elementary.settings.datetime,
+ io.elementary.settings.desktop, io.elementary.settings.display,
+ io.elementary.settings.keyboard, io.elementary.settings.locale,
+ io.elementary.settings.mouse-touchpad, io.elementary.settings.network,
+ io.elementary.settings.notifications, io.elementary.settings.power,
+ io.elementary.settings.printers, io.elementary.settings.security-privacy,
+ io.elementary.settings.sharing, io.elementary.settings.sound,
+ io.elementary.settings.useraccounts, io.elementary.settings.wacom,
+ pantheon-files, io.elementary.terminal, io.elementary.code,
+ fonts-inter, fonts-open-sans, xserver-xorg, xinit
+Provides: pantheon-shell
+Description: ShellOS desktop: Pantheon
+ elementary OS's Pantheon desktop (Gala, Wingpanel, Dock, System Settings,
+ Files, Terminal and Code), built for Debian trixie by ShellOS.
+
+Package: shellos-de-gnome
+Architecture: all
+Depends: ${misc:Depends}, shellos-desktop, gnome-core
+Description: ShellOS desktop: GNOME
+ Debian's core GNOME desktop. ShellOS keeps its shared login screen; GNOME's
+ own (GDM) is installed but not used.
+
+Package: shellos-de-kde
+Architecture: all
+Depends: ${misc:Depends}, shellos-desktop, kde-plasma-desktop
+Description: ShellOS desktop: KDE Plasma
+ Debian's core KDE Plasma desktop. ShellOS keeps its shared login screen;
+ Plasma's own (SDDM) is installed but not used.
+
+Package: shellos-wm-common
+Architecture: all
+Depends: ${misc:Depends}, shellos-desktop,
+ xserver-xorg, xinit, x11-xserver-utils, rofi, picom, dunst, feh, i3lock, xss-lock,
+ maim, xclip, lxpolkit, network-manager-gnome, pavucontrol, brightnessctl, playerctl,
+ fonts-font-awesome
+Description: shared pieces of the ShellOS X11 window managers
+ Launcher, notification, compositor and lock-screen setup in the ShellOS
+ colours, used by the i3, bspwm and dwm desktops.
+
+Package: shellos-de-hyprland
+Architecture: all
+Depends: ${misc:Depends}, shellos-desktop,
+ hyprland (>= 0.55), hypridle, hyprlock, hyprpolkitagent, xdg-desktop-portal-hyprland,
+ waybar, fuzzel, mako-notifier, swaybg, grim, slurp, wl-clipboard,
+ network-manager-gnome, pavucontrol, brightnessctl, playerctl, fonts-font-awesome,
+ qt6-wayland
+Description: ShellOS desktop: Hyprland
+ The Hyprland tiling Wayland compositor (from trixie-backports) with the
+ ShellOS configuration: Waybar, fuzzel launcher, mako notifications,
+ hyprlock and hypridle, and the shared ShellOS keybindings.
+
+Package: shellos-de-i3
+Architecture: all
+Depends: ${misc:Depends}, shellos-wm-common, i3-wm, i3status
+Description: ShellOS desktop: i3
+ The i3 tiling window manager with the ShellOS configuration: i3bar,
+ rofi launcher, dunst notifications, picom, and the shared ShellOS
+ keybindings.
+
+Package: shellos-de-bspwm
+Architecture: all
+Depends: ${misc:Depends}, shellos-wm-common, bspwm, sxhkd, polybar
+Description: ShellOS desktop: bspwm
+ The bspwm tiling window manager with the ShellOS configuration: sxhkd keys,
+ polybar, rofi launcher, dunst notifications, picom, and the shared ShellOS
+ keybindings.
+
+Package: shellos-de-dwm
+Architecture: all
+Depends: ${misc:Depends}, shellos-wm-common, shellos-dwm
+Description: ShellOS desktop: dwm
+ suckless dwm built with the ShellOS configuration, with a status line,
+ rofi launcher, dunst notifications, picom, and the shared ShellOS
+ keybindings.

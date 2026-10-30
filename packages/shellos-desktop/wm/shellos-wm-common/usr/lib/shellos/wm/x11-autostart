@@ -1,0 +1,17 @@
+#!/bin/sh
+# Start the ShellOS X11 session services (i3, bspwm, dwm). Each is started
+# only if it isn't already running, so reloading a window manager is safe.
+start() { # name command...
+	pgrep -u "$(id -u)" -x "$1" >/dev/null || "$@" &
+}
+WALLPAPER=/usr/share/backgrounds/shellos/shellos-spiral.png
+
+xsetroot -cursor_name left_ptr
+[ -f "$WALLPAPER" ] && feh --no-fehbg --bg-fill "$WALLPAPER"
+start picom
+start dunst
+start lxpolkit
+start nm-applet
+# Lock on suspend and after 10 minutes idle.
+xset s 600 600
+start xss-lock -- shellos-lock

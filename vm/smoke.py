@@ -119,7 +119,7 @@ class Serial:
 
 PROFILES = ("desktop", "minimal", "diagnostic")
 DESKTOP_PACKAGES = ("cosmic-session", "cosmic-greeter", "scx-scheds", "calamares",
-                    "shellos-installer", "shellos-desktop", "firefox")
+                    "shellos-installer", "shellos-desktop", "shellos-de-cosmic", "firefox")
 
 
 def profile_from_name(iso):
@@ -183,6 +183,9 @@ def checks(sh, profile):
               lambda rc, o: o == "yes")
         check("installer launcher present", "command -v shellos-install calamares | wc -l",
               lambda rc, o: o == "2")
+        check("desktop chooser ready", "shellos-desktops list | grep -c '^\\* cosmic$'; "
+              "test -f /etc/calamares/modules/packagechooser_desktops.conf && echo conf",
+              lambda rc, o: o.split() == ["1", "conf"])
         check("Firefox installed", "command -v firefox")
     return results
 

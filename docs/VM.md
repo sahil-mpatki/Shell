@@ -47,6 +47,11 @@ vm/shellos-vm boot                           # boots the VM disk through Limine
 vm/shellos-vm reset                          # start over (deletes the VM disk)
 ```
 
+On the installer's **Desktops** page, tick any of COSMIC, Pantheon, GNOME,
+KDE Plasma, Hyprland, i3, dwm and bspwm; everything but COSMIC downloads
+during the install (the VM has network through QEMU's user networking). Pick
+one at the login screen. See [DESKTOPS.md](DESKTOPS.md).
+
 The VM disk is a 40 GB sparse qcow2 on an NVMe controller (so the NVMe
 I/O-scheduler rule is exercised), stored in `~/.local/share/shellos-vm/`
 together with the VM's UEFI variables.

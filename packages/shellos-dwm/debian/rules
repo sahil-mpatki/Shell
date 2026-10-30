@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_auto_configure:
+	cp files/config.h config.h
+
+override_dh_auto_build:
+	$(MAKE) PREFIX=/usr
+
+override_dh_auto_install:
+	$(MAKE) PREFIX=/usr DESTDIR=$(CURDIR)/debian/shellos-dwm install
+	install -Dm755 files/shellos-dwm-session debian/shellos-dwm/usr/bin/shellos-dwm-session
+	install -Dm755 files/shellos-dwm-status debian/shellos-dwm/usr/bin/shellos-dwm-status
+	install -Dm644 files/dwm.desktop debian/shellos-dwm/usr/share/xsessions/dwm.desktop
+
+override_dh_auto_clean:
+	rm -f config.h dwm *.o

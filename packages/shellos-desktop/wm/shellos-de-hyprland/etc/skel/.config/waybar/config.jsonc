@@ -1,0 +1,19 @@
+// ShellOS Waybar (Hyprland).
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "spacing": 6,
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["hyprland/window"],
+    "modules-right": ["tray", "pulseaudio", "network", "cpu", "memory", "battery", "clock"],
+    "hyprland/workspaces": { "format": "{name}", "on-click": "activate" },
+    "hyprland/window": { "max-length": 60 },
+    "tray": { "spacing": 8 },
+    "pulseaudio": { "format": "vol {volume}%", "format-muted": "vol muted", "on-click": "pavucontrol" },
+    "network": { "format-wifi": "{essid}", "format-ethernet": "wired", "format-disconnected": "offline", "on-click": "nm-connection-editor" },
+    "cpu": { "format": "cpu {usage}%" },
+    "memory": { "format": "mem {percentage}%" },
+    "battery": { "format": "bat {capacity}%", "format-charging": "⚡{capacity}%", "states": { "warning": 25, "critical": 10 } },
+    "clock": { "format": "{:%a %d %b  %H:%M}", "tooltip-format": "<tt>{calendar}</tt>" }
+}

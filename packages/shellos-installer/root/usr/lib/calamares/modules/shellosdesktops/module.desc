@@ -1,0 +1,6 @@
+# Installs the desktops picked on the "Desktops" page.
+---
+type:       "job"
+name:       "shellosdesktops"
+interface:  "python"
+script:     "main.py"

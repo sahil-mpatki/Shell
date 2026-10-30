@@ -1,0 +1,145 @@
+#!/bin/sh
+# Add, remove or list ShellOS desktops. The installer runs `set` with the
+# desktops you ticked; afterwards, use add/remove to change your mind.
+#
+#   shellos-desktops list
+#   shellos-desktops add ID...      install desktops (needs network)
+#   shellos-desktops remove ID...   remove desktops (at least one stays)
+#   shellos-desktops set ID...      exactly these desktops
+#
+# IDs: cosmic pantheon gnome kde hyprland i3 dwm bspwm
+# Every desktop is listed on the shared login screen (cosmic-greeter);
+# GNOME's and KDE's own login screens are installed but not used.
+set -eu
+
+ALL="cosmic pantheon gnome kde hyprland i3 dwm bspwm"
+PIN=/etc/apt/preferences.d/shellos-hyprland
+BACKPORTS=/etc/apt/sources.list.d/debian-backports.sources
+export DEBIAN_FRONTEND=noninteractive
+
+die() { echo "shellos-desktops: $*" >&2; exit 1; }
+installed() { dpkg-query -W -f '${db:Status-Abbrev}' "shellos-de-$1" 2>/dev/null | grep -q '^ii'; }
+
+check_ids() {
+	[ $# -gt 0 ] || die "no desktop given (choose from: $ALL)"
+	for id in "$@"; do
+		case " $ALL " in *" $id "*) ;; *) die "unknown desktop '$id' (choose from: $ALL)" ;; esac
+	done
+}
+
+# Hyprland and its libraries come from trixie-backports. Pin just those, so
+# nothing else on the system moves to backports.
+hyprland_sources() {
+	if [ ! -e "$BACKPORTS" ] && ! grep -rqs trixie-backports /etc/apt/sources.list /etc/apt/sources.list.d/; then
+		cat > "$BACKPORTS" <<-EOF
+		Types: deb
+		URIs: http://deb.debian.org/debian
+		Suites: trixie-backports
+		Components: main contrib non-free non-free-firmware
+		Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+		EOF
+	fi
+	cat > "$PIN" <<-EOF
+	# Written by shellos-desktops: Hyprland's stack from trixie-backports only.
+	Package: hyprland* hypr* libhypr* libaquamarine* xdg-desktop-portal-hyprland qml6-module-org-hyprland-* libxkbcommon0 libxkbcommon-x11-0 libxkbcommon-dev libudis86-0
+	Pin: release n=trixie-backports
+	Pin-Priority: 500
+	EOF
+}
+
+# Keep the shared login screen, whatever GNOME's or KDE's packages ask for.
+shared_greeter() {
+	for owner in cosmic-greeter gdm3 sddm lightdm; do
+		echo "$owner shared/default-x-display-manager select cosmic-greeter"
+	done | debconf-set-selections
+	echo /usr/bin/cosmic-greeter > /etc/X11/default-display-manager
+	ln -sf /usr/lib/systemd/system/cosmic-greeter.service /etc/systemd/system/display-manager.service
+}
+
+# New accounts get the desktops' configs from /etc/skel. Give existing users
+# any they don't have yet, never overwriting their own.
+seed_users() { # package...
+	files="$(dpkg-query -L "$@" 2>/dev/null | grep '^/etc/skel/' || true)"
+	[ -n "$files" ] || return 0
+	getent passwd | while IFS=: read -r user _ uid gid _ home _; do
+		if [ "$uid" -lt 1000 ] || [ "$uid" -ge 60000 ] || [ ! -d "$home" ]; then
+			continue
+		fi
+		echo "$files" | while read -r f; do
+			[ -f "$f" ] || continue
+			dest="$home/${f#/etc/skel/}"
+			[ -e "$dest" ] && continue
+			# Directories created as the user, so they own every new level.
+			runuser -u "$user" -- mkdir -p "$(dirname "$dest")"
+			install -o "$uid" -g "$gid" -m "$(stat -c %a "$f")" "$f" "$dest"
+		done
+		echo "  configs added for $user"
+	done
+}
+
+do_add() {
+	check_ids "$@"
+	pkgs="" missing=""
+	for id in "$@"; do
+		pkgs="$pkgs shellos-de-$id"
+		installed "$id" || missing="$missing shellos-de-$id"
+		if [ "$id" = hyprland ]; then hyprland_sources; fi
+	done
+	shared_greeter
+	# Nothing to download when only COSMIC (on the live image) is wanted.
+	if [ -n "$missing" ]; then
+		apt-get update
+		# shellcheck disable=SC2086 # word-splitting the package list is intended
+		apt-get install -y $missing
+		shared_greeter
+	fi
+	# shellcheck disable=SC2086
+	seed_users $pkgs shellos-wm-common
+}
+
+do_remove() {
+	check_ids "$@"
+	keep=0
+	for id in $ALL; do
+		case " $* " in *" $id "*) ;; *) installed "$id" && keep=$((keep + 1)) ;; esac
+	done
+	[ "$keep" -gt 0 ] || die "refusing to remove every desktop"
+	pkgs=""
+	for id in "$@"; do
+		installed "$id" && pkgs="$pkgs shellos-de-$id"
+		[ "$id" = hyprland ] && rm -f "$PIN"
+	done
+	[ -n "$pkgs" ] || return 0
+	# shellcheck disable=SC2086
+	apt-get purge -y $pkgs
+	apt-get autoremove --purge -y
+	shared_greeter
+}
+
+do_set() {
+	check_ids "$@"
+	do_add "$@"
+	drop=""
+	for id in $ALL; do
+		case " $* " in *" $id "*) ;; *) installed "$id" && drop="$drop $id" ;; esac
+	done
+	# shellcheck disable=SC2086
+	[ -z "$drop" ] || do_remove $drop
+}
+
+do_list() {
+	for id in $ALL; do
+		if installed "$id"; then echo "* $id"; else echo "  $id"; fi
+	done
+}
+
+cmd="${1:-list}"
+[ $# -gt 0 ] && shift
+case "$cmd" in
+	list) do_list ;;
+	add|remove|set)
+		[ "$(id -u)" -eq 0 ] || die "run as root (sudo shellos-desktops $cmd ...)"
+		"do_$cmd" "$@"
+		;;
+	*) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
+esac
