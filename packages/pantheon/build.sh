@@ -76,6 +76,15 @@ fixups() { # name dir
 			done
 			! grep -rqw libgranite7 "$dir/debian" || die "granite: package rename no longer applies"
 			;;
+		default-settings)
+			# Ubuntu-only pieces: an AppArmor profile for bubblewrap under
+			# Ubuntu's userns restriction, and a netplan file (ShellOS uses
+			# NetworkManager directly).
+			rm -f "$dir/debian/links"
+			sed -i '\#usr/share/apparmor/extra-profiles#d; \#etc/netplan/#d' "$dir/debian/install"
+			! grep -qE 'apparmor|netplan' "$dir/debian/install" \
+				|| die "default-settings: Ubuntu-only file removal no longer applies"
+			;;
 	esac
 }
 

@@ -73,10 +73,19 @@ def main(path):
             continue
         value = lines[i][len(m.group(0)):]
         i += 1
-        while i < len(lines) and lines[i][:1] in (" ", "\t") and lines[i].strip():
-            value += " " + lines[i].strip()
+        # Continuation lines, with comment lines allowed in between (they're
+        # dropped: the field is rewritten as a whole).
+        while i < len(lines) and (
+            (lines[i][:1] in (" ", "\t") and lines[i].strip()) or lines[i].startswith("#")
+        ):
+            if not lines[i].startswith("#"):
+                value += " " + lines[i].strip()
             i += 1
-        out.append(f"{m.group(1)}:\n {fix_relation(value)}")
+        relation = fix_relation(value)
+        # meson projects look up systemd.pc, which trixie ships in systemd-dev.
+        if m.group(1) == "Build-Depends" and not re.search(r"(^|[\s,])systemd-dev\b", relation):
+            relation += ",\n systemd-dev"
+        out.append(f"{m.group(1)}:\n {relation}")
     open(path, "w").write("\n".join(out))
 
 

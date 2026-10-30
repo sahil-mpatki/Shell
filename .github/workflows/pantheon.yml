@@ -47,6 +47,8 @@ jobs:
   # Stage 2: everything that needs only stage 1 (gala, switchboard, apps).
   stage2:
     needs: [list, stage1]
+    # Build what can be built even if an earlier component failed.
+    if: ${{ !cancelled() && needs.list.result == 'success' }}
     runs-on: ubuntu-latest
     container: debian:trixie
     strategy:
@@ -75,6 +77,8 @@ jobs:
   # Stage 3: wingpanel (needs gala) and the switchboard plugs.
   stage3:
     needs: [list, stage2]
+    # Build what can be built even if an earlier component failed.
+    if: ${{ !cancelled() && needs.list.result == 'success' }}
     runs-on: ubuntu-latest
     container: debian:trixie
     strategy:
@@ -103,6 +107,8 @@ jobs:
   # Stage 4: wingpanel indicators, quick settings, applications menu.
   stage4:
     needs: [list, stage3]
+    # Build what can be built even if an earlier component failed.
+    if: ${{ !cancelled() && needs.list.result == 'success' }}
     runs-on: ubuntu-latest
     container: debian:trixie
     strategy:

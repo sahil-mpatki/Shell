@@ -4,7 +4,8 @@
 # commit whose changelog is that release (the branch head often runs ahead).
 # Stage: 1 = granite, pantheon-wayland (trixie's granite is too old for the
 # rest), 2 = needs stage 1 (gala, switchboard, apps), 3 = needs gala or
-# switchboard (wingpanel, plugs), 4 = needs wingpanel. Update deliberately.
+# switchboard (wingpanel, plugs; pantheon-wayland's library depends on gala),
+# 4 = needs wingpanel. Update deliberately.
 granite                            1  7.8.1  4cd5188619e65f2f2410c9af834df903f6e4f85e 3a76a32365b537f771e48a42bd63b78b366e8a14
 pantheon-wayland                   1  1.1.0  08e7f25928c16e2a238054d9904a93dcf519a7e0 818bd71fa3363a85f61185759e6233cb309051e2
 bluetooth-daemon                   2  1.1.0  812cd1cd9f507b3de9487d3d6c59b0f339e018a7 41e540f64fcbd98b5e25760c38e5cfa3967b5dc7
@@ -15,11 +16,11 @@ files                              2  7.3.3  ddb727f59d53cfc41815f430caab0a2cb58
 gala                               2  8.6.2  038ca7adcbfdbc2a95ff9deefd63a3050cb10181 b99eb679d3eeb40870c3720cddbd3ddf1a3c2d62
 icons                              2  9.0.0  31c7285a1d10170abd363a2553a7f377a031bb33 9d3e9ada4bf40b40234b7af26b3b64203defdebc
 notifications                      2  8.1.2  0fbd2fb200dfac6489df8af1ca5b174abfe831cd a381ca0248a3de46bcc91d6e7cabb436f385a666
-pantheon-agent-polkit              2  8.1.0  ed4d4c72d7757c8c8371b565ae86c3968a038e02 fc6d5955bc055340682843419b4d40a485497a54
-portals                            2  8.2.0  ac3464d7d1834aded91342bdabb3a24f99c7d980 b8f28825260b45374c6b6d2d0341e6047b0725aa
+pantheon-agent-polkit              3  8.1.0  ed4d4c72d7757c8c8371b565ae86c3968a038e02 fc6d5955bc055340682843419b4d40a485497a54
+portals                            3  8.2.0  ac3464d7d1834aded91342bdabb3a24f99c7d980 b8f28825260b45374c6b6d2d0341e6047b0725aa
 session-settings                   2  8.1.0  7d66efddcd48d2ab02d53cf13f37bb52e6abaca9 c55090e9c86c3e703f48c1f220f6101c7d9323b5
 settings-daemon                    2  8.5.0  19b2829f949b5b31ea98baf95a776c36a8761ebc 3d5fc2b07520f1e1e14095d693b9a32663ae9911
-shortcut-overlay                   2  8.1.0  f831f994c36295fb236cf87c722cf733f43d32eb 4e1a1c9197ca1ad290d3a80dc12ed062566fb706
+shortcut-overlay                   3  8.1.0  f831f994c36295fb236cf87c722cf733f43d32eb 4e1a1c9197ca1ad290d3a80dc12ed062566fb706
 sound-theme                        2  1.1.0  88cb3a325995fcd5fe123f189062e3efb69972ca cdb77a51c7f94bed9c94493912ef3134917a50f9
 stylesheet                         2  8.2.2  9cfb767873d583f6ed29e96cf27728bb69fd9237 8c15f6cc3eeff14f1545376f8e0a59dcde6a23de
 switchboard                        2  8.0.3  6714b3c8f6d0e6d386c3190e1c15b1d651faae2a 6967002019d8ab55cf5e7142a097549fe9381660
