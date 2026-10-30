@@ -28,7 +28,9 @@ check_ids() {
 }
 
 # Hyprland and its libraries come from trixie-backports. Pin just those, so
-# nothing else on the system moves to backports.
+# nothing else on the system moves to backports. Hyprland needs a newer
+# libxkbcommon; its whole source family moves together (libxkbregistry0
+# depends on the exact libxkbcommon0 version, and GNOME/KDE use it).
 hyprland_sources() {
 	if [ ! -e "$BACKPORTS" ] && ! grep -rqs trixie-backports /etc/apt/sources.list /etc/apt/sources.list.d/; then
 		cat > "$BACKPORTS" <<-EOF
@@ -41,7 +43,7 @@ hyprland_sources() {
 	fi
 	cat > "$PIN" <<-EOF
 	# Written by shellos-desktops: Hyprland's stack from trixie-backports only.
-	Package: hyprland* hypr* libhypr* libaquamarine* xdg-desktop-portal-hyprland qml6-module-org-hyprland-* libxkbcommon0 libxkbcommon-x11-0 libxkbcommon-dev libudis86-0
+	Package: hyprland* hypr* libhypr* libaquamarine* xdg-desktop-portal-hyprland qml6-module-org-hyprland-* libxkbcommon* libxkbregistry* libudis86-0
 	Pin: release n=trixie-backports
 	Pin-Priority: 500
 	EOF
