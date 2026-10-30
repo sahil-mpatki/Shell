@@ -68,6 +68,8 @@ Details and citations: [KERNEL.md](KERNEL.md).
 | 41 | Hyprland source | Debian trixie-backports (0.55), pinned to just its own stack | delegated, following 35 |
 | 42 | GTK3 theme | **adw-gtk3** packaged, so GTK3 apps match COSMIC | owner |
 | 43 | Kernel headers | `linux-libc-dev` from the kernel build is **not** published | owner |
+| 44 | Project website | landing page on GitHub Pages (`web/`), downloads from the latest GitHub release | owner |
+| 45 | Update notifications | desktop notification when a new GitHub release is out (`shellos-update-check`, user timer) | owner |
 
 ## Infrastructure
 

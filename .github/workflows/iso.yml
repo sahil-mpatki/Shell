@@ -28,6 +28,8 @@ jobs:
     env:
       PROFILE: ${{ inputs.profile || 'desktop' }}
       SHELLOS_APT_URL: https://sahil-mpatki.github.io/Shell/apt
+      # Recorded in the image as /etc/shellos-release (empty for weekly builds).
+      SHELLOS_RELEASE: ${{ inputs.version }}
     steps:
       - uses: actions/checkout@v4
       - name: Fetch the ShellOS archive key
@@ -49,7 +51,7 @@ jobs:
         if: steps.repo.outputs.ready == 'true'
         run: |
           docker run --rm --privileged -v "$PWD:/src" -w /src \
-            -e SHELLOS_APT_URL -e DEB_DIRS=/nonexistent debian:trixie bash -euxc '
+            -e SHELLOS_APT_URL -e SHELLOS_RELEASE -e DEB_DIRS=/nonexistent debian:trixie bash -euxc '
               apt-get update
               apt-get install -y --no-install-recommends ca-certificates curl gpg \
                 mmdebstrap squashfs-tools xorriso apt-utils

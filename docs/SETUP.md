@@ -79,6 +79,7 @@ command again for the Propeller stage (`…-shellos-afdo-prop`). See
 | Task | Command |
 |---|---|
 | Update everything | `sudo apt update && sudo apt full-upgrade` |
+| New-release notifications | on by default; `shellos-update-check --status`, or turn off with `systemctl --user disable --now shellos-update-check.timer` |
 | Take a snapshot | `sudo snapper create -d "before X"` (apt also snapshots automatically) |
 | Boot an old snapshot | pick it under **Snapshots** in the Limine menu |
 | Keep that snapshot | `sudo shellos-rollback N`, then reboot |

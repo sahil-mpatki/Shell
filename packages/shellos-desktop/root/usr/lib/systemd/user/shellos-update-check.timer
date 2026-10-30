@@ -1,0 +1,10 @@
+[Unit]
+Description=Check for a new ShellOS release after login and every 6 hours
+
+[Timer]
+OnStartupSec=5min
+OnUnitActiveSec=6h
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

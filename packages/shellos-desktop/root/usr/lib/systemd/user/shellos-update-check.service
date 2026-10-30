@@ -1,0 +1,9 @@
+[Unit]
+Description=Check for a new ShellOS release
+Documentation=https://github.com/sahil-mpatki/Shell/releases
+# Needs the desktop session's notification server.
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/shellos-update-check

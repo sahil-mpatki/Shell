@@ -19,6 +19,10 @@ a 12th–14th gen Intel Core i5 desktop, with the desktop(s) of your choice.
   zsh + starship, Alacritty, Firefox (Mozilla repo), Flatpak/Flathub,
   Distrobox. See [docs/DESKTOPS.md](docs/DESKTOPS.md).
 * **Install**: live ISO (COSMIC) + Calamares.
+* **Updates**: everything comes from a signed apt repo, and the desktop tells
+  you when a new release is published.
+
+Website and downloads: https://sahil-mpatki.github.io/Shell/
 
 Every decision and who made it: [docs/DECISIONS.md](docs/DECISIONS.md).
 First-time setup: [docs/SETUP.md](docs/SETUP.md).

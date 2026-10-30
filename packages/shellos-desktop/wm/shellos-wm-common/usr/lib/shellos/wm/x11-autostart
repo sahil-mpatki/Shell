@@ -6,6 +6,9 @@ start() { # name command...
 }
 WALLPAPER=/usr/share/backgrounds/shellos/shellos-spiral.png
 
+# Let systemd user services (e.g. the release notifier) reach this display.
+dbus-update-activation-environment --systemd DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP
+
 xsetroot -cursor_name left_ptr
 [ -f "$WALLPAPER" ] && feh --no-fehbg --bg-fill "$WALLPAPER"
 start picom

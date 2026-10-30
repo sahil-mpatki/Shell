@@ -24,6 +24,8 @@ Depends: ${misc:Depends},
 # Session plumbing
  pipewire-audio, wireplumber, playerctl, network-manager, bluez,
  power-profiles-daemon, fwupd, xdg-user-dirs, plymouth, plymouth-label, sudo,
+# Release notifications (shellos-update-check)
+ curl, python3, libnotify-bin, xdg-utils,
 # Your picks: zsh, Alacritty, Firefox (Mozilla repo), Flatpak, Distrobox
  zsh, zsh-autosuggestions, zsh-syntax-highlighting, starship, alacritty,
  firefox, flatpak, distrobox, podman,

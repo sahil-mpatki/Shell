@@ -17,6 +17,8 @@ hl.env("HYPRCURSOR_SIZE", "24")
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 
 hl.on("hyprland.start", function ()
+    -- Let systemd user services (e.g. the release notifier) reach this session.
+    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
     hl.exec_cmd("swaybg -m fill -i /usr/share/backgrounds/shellos/shellos-spiral.png")
     hl.exec_cmd("waybar")
     hl.exec_cmd("mako")

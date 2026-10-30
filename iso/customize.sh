@@ -47,6 +47,11 @@ sed -i 's|^#\? *SHELL=.*|SHELL=/bin/zsh|' "$ROOT/etc/default/useradd"
 [[ -e $ROOT/etc/skel/.zshrc ]] || echo "# ~/.zshrc" > "$ROOT/etc/skel/.zshrc"
 
 echo shellos > "$ROOT/etc/hostname"
+# The release this image is (empty for weekly builds); shellos-update-check
+# compares it with the newest release on GitHub.
+if [[ -n ${SHELLOS_RELEASE:-} ]]; then
+	echo "$SHELLOS_RELEASE" > "$ROOT/etc/shellos-release"
+fi
 
 # --- live session ------------------------------------------------------------
 # Everything below is removed by the installer (shellprocess_bootloader.conf).
