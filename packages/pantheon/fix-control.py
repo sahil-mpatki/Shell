@@ -17,7 +17,6 @@ RENAME = [
     (r"libwingpanel-\d+-dev", "libwingpanel-dev"),
     (r"libgdk-pixbuf2\.0-dev", "libgdk-pixbuf-2.0-dev"),
     (r"policykit-1", "polkitd"),
-    (r"wingpanel-indicator-bluetooth", "io.elementary.panel.bluetooth"),
 ]
 # Gone from trixie with no replacement (the dependent feature degrades).
 # aptdaemon: the locale plug used it to install language packs.

@@ -51,15 +51,23 @@ Description: ShellOS desktop: COSMIC
 Package: shellos-de-pantheon
 Architecture: all
 Depends: ${misc:Depends}, shellos-desktop,
- gala, io.elementary.wingpanel, io.elementary.dock, io.elementary.applications-menu,
+ gala, io.elementary.wingpanel, io.elementary.dock,
+ io.elementary.applications-menu | slingshot-launcher,
  io.elementary.quick-settings, io.elementary.notifications, io.elementary.settings-daemon,
  io.elementary.portals, pantheon-agent-polkit, pantheon-xsession-settings,
  elementary-default-settings, io.elementary.stylesheet, elementary-icon-theme,
  io.elementary.sound-theme, elementary-wallpapers, io.elementary.shortcut-overlay,
  io.elementary.bluetooth-daemon,
- io.elementary.panel.bluetooth, io.elementary.panel.datetime, io.elementary.panel.keyboard,
- io.elementary.panel.network, io.elementary.panel.nightlight,
- io.elementary.panel.notifications, io.elementary.panel.power, io.elementary.panel.sound,
+# Panel indicators and app menu: elementary renamed these after the releases
+# we build (wingpanel-indicator-* -> io.elementary.panel.*), so accept either.
+ io.elementary.panel.bluetooth | wingpanel-indicator-bluetooth,
+ io.elementary.panel.datetime | wingpanel-indicator-datetime,
+ io.elementary.panel.keyboard | wingpanel-indicator-keyboard,
+ io.elementary.panel.network | wingpanel-indicator-network,
+ io.elementary.panel.nightlight | wingpanel-indicator-nightlight,
+ io.elementary.panel.notifications | wingpanel-indicator-notifications,
+ io.elementary.panel.power | wingpanel-indicator-power,
+ io.elementary.panel.sound | wingpanel-indicator-sound,
  io.elementary.settings, io.elementary.settings.system, io.elementary.settings.applications,
  io.elementary.settings.bluetooth, io.elementary.settings.datetime,
  io.elementary.settings.desktop, io.elementary.settings.display,
