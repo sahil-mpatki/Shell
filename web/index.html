@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShellOS</title>
+<meta name="description" content="ShellOS: a tuned Debian 13 for Intel 12th–14th gen, with a profile-guided kernel, Btrfs snapshots you can boot, and eight desktops to choose from.">
+<meta name="theme-color" content="#0B1416">
+<link rel="icon" href="art/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top"><img src="art/logo.svg" alt="" width="28" height="28"><span>ShellOS</span></a>
+    <nav aria-label="Main">
+      <a href="#features">Features</a>
+      <a href="#desktops">Desktops</a>
+      <a href="#download">Download</a>
+      <a href="https://github.com/sahil-mpatki/Shell#readme">Docs</a>
+      <a class="gh" href="https://github.com/sahil-mpatki/Shell">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div class="hero-text">
+        <p class="eyebrow">Debian 13 “trixie”, rebuilt for one kind of machine</p>
+        <h1>A fast, quiet desktop<br>for Intel 12th–14th gen.</h1>
+        <p class="lede">ShellOS pairs a kernel compiled for Alder Lake, tuned by how <em>you</em> use it,
+          with bootable Btrfs snapshots and a choice of eight desktops, from COSMIC and
+          elementary’s Pantheon to Hyprland and dwm.</p>
+        <div class="cta">
+          <a class="btn primary" id="hero-download" href="https://github.com/sahil-mpatki/Shell/releases/latest">Download ShellOS</a>
+          <a class="btn ghost" href="https://github.com/sahil-mpatki/Shell">View source</a>
+        </div>
+        <p class="release-line" id="hero-release" aria-live="polite">Latest release on GitHub</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <img src="art/logo.svg" alt="">
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="section">
+    <div class="wrap">
+      <h2>What’s inside</h2>
+      <div class="grid features">
+        <article class="card">
+          <h3>A kernel that learns your workload</h3>
+          <p>Linux 6.18 LTS built with Clang ThinLTO for <code>-march=alderlake</code>, BORE and the
+            sched_ext LAVD scheduler, and a one-command AutoFDO + Propeller loop that recompiles it
+            from profiles of your own machine.</p>
+        </article>
+        <article class="card">
+          <h3>Memory that stays responsive</h3>
+          <p>zram with lz4 and idle recompression to zstd, MGLRU thrash protection, and
+            <code>shellos-senpai</code>, a pressure-driven reclaimer modelled on Meta’s TMO.</p>
+        </article>
+        <article class="card">
+          <h3>Snapshots you can boot</h3>
+          <p>Btrfs with Snapper. Every apt run takes a snapshot, the Limine menu lists them, and
+            <code>shellos-rollback</code> makes any of them your system again.</p>
+        </article>
+        <article class="card">
+          <h3>Eight desktops, one login screen</h3>
+          <p>Tick as many as you like in the installer and pick one at each login. Change your mind
+            later with <code>shellos-desktops add</code> or <code>remove</code>.</p>
+        </article>
+        <article class="card">
+          <h3>Sensible defaults</h3>
+          <p>zsh with starship, Alacritty, Firefox from Mozilla’s repo, Flatpak with Flathub, and
+            Distrobox with Podman for everything else.</p>
+        </article>
+        <article class="card">
+          <h3>Built in the open</h3>
+          <p>Every package is built by GitHub Actions from pinned sources, signed, and published
+            to an apt repository. Each ISO is boot-tested in a VM before it’s released, and your
+            desktop lets you know when a new one is out.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="desktops" class="section alt">
+    <div class="wrap">
+      <h2>Pick your desktop</h2>
+      <p class="sub">COSMIC comes on the ISO; the others download during installation.</p>
+      <div class="grid desktops">
+        <article class="de"><h3>COSMIC</h3><p>System76’s Rust desktop, rebuilt for Debian. The live session.</p><span class="tag">Wayland</span></article>
+        <article class="de"><h3>Pantheon</h3><p>elementary OS 8’s calm desktop: Gala, Wingpanel, Dock and elementary’s apps.</p><span class="tag">X11</span></article>
+        <article class="de"><h3>GNOME</h3><p>Debian’s core GNOME 48, from Activities overview to Files.</p><span class="tag">Wayland</span></article>
+        <article class="de"><h3>KDE Plasma</h3><p>Debian’s core Plasma 6, endlessly configurable.</p><span class="tag">Wayland</span></article>
+        <article class="de"><h3>Hyprland</h3><p>Animated tiling compositor with Waybar, fuzzel and hyprlock, ShellOS-configured.</p><span class="tag">Wayland · tiling</span></article>
+        <article class="de"><h3>i3</h3><p>The classic tiling window manager with i3bar, rofi and picom.</p><span class="tag">X11 · tiling</span></article>
+        <article class="de"><h3>dwm</h3><p>suckless’s minimal window manager, compiled with the ShellOS config.</p><span class="tag">X11 · tiling</span></article>
+        <article class="de"><h3>bspwm</h3><p>Binary-space tiling with sxhkd and polybar.</p><span class="tag">X11 · tiling</span></article>
+      </div>
+      <p class="sub small">The tiling window managers share one set of keys: Super+Return for a terminal, Super+D for apps, Super+Q to close, Super+1–9 for workspaces.</p>
+    </div>
+  </section>
+
+  <section id="download" class="section">
+    <div class="wrap">
+      <h2>Download</h2>
+      <div class="download">
+        <div class="card release" id="release">
+          <div class="release-head">
+            <div>
+              <h3 id="rel-name">Latest release</h3>
+              <p class="muted" id="rel-meta">Loading release details from GitHub…</p>
+            </div>
+            <a class="btn primary" id="rel-iso" href="https://github.com/sahil-mpatki/Shell/releases/latest">Download ISO</a>
+          </div>
+          <ul class="assets" id="rel-assets"></ul>
+          <div id="rel-join" hidden>
+            <p class="muted">This release is split into parts. Join them, then verify:</p>
+            <pre><code id="rel-join-cmd"></code></pre>
+          </div>
+          <p class="muted small"><a href="https://github.com/sahil-mpatki/Shell/releases">All releases</a></p>
+        </div>
+        <div class="card steps">
+          <h3>Verify, then try it in a VM</h3>
+          <pre><code>sha256sum -c shellos-*.iso.sha256
+git clone https://github.com/sahil-mpatki/Shell &amp;&amp; cd Shell
+vm/shellos-vm live ../shellos-*.iso</code></pre>
+          <p class="muted">Then write it to a USB stick and boot it:</p>
+          <pre><code>sudo dd if=shellos-*.iso of=/dev/sdX bs=4M status=progress oflag=sync</code></pre>
+          <h3>Requirements</h3>
+          <ul class="reqs">
+            <li>x86-64 CPU with Alder Lake-class extensions: Intel 12th gen or newer, or AMD Zen 3+</li>
+            <li>UEFI firmware, Secure Boot off</li>
+            <li>4 GB RAM and 24 GB of disk; network during install for desktops other than COSMIC</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="apt" class="section alt">
+    <div class="wrap">
+      <h2>Already on Debian trixie?</h2>
+      <p class="sub">ShellOS’s packages live in a signed apt repository on this site.</p>
+      <pre><code>curl -fsSL https://sahil-mpatki.github.io/Shell/apt/shellos-archive.asc | sudo tee /etc/apt/keyrings/shellos-archive.asc
+echo "deb [signed-by=/etc/apt/keyrings/shellos-archive.asc] https://sahil-mpatki.github.io/Shell/apt trixie main" | sudo tee /etc/apt/sources.list.d/shellos.list</code></pre>
+      <p class="muted small"><a href="apt/dists/trixie/main/binary-amd64/Packages">Package index</a></p>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span><img src="art/logo-mono.svg" alt="" width="18" height="18"> ShellOS</span>
+    <nav aria-label="Footer">
+      <a href="https://github.com/sahil-mpatki/Shell/blob/main/docs/DESKTOPS.md">Desktops</a>
+      <a href="https://github.com/sahil-mpatki/Shell/blob/main/docs/KERNEL.md">Kernel</a>
+      <a href="https://github.com/sahil-mpatki/Shell/blob/main/docs/VM.md">Testing in a VM</a>
+      <a href="https://github.com/sahil-mpatki/Shell/blob/main/docs/SETUP.md">Setup</a>
+      <a href="https://github.com/sahil-mpatki/Shell/releases">Releases</a>
+    </nav>
+  </div>
+</footer>
+<script src="site.js"></script>
+</body>
+</html>

@@ -5,6 +5,12 @@ on:
     workflows: [kernel, packages, cosmic, tools, pantheon]
     types: [completed]
     branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - 'scripts/publish-apt.sh'
+      - '.github/workflows/publish.yml'
   workflow_dispatch:
 
 permissions:

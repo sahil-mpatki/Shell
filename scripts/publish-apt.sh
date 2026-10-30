@@ -80,15 +80,10 @@ gpg --batch --yes --local-user "$GPG_KEY_ID" --clearsign -o dists/trixie/InRelea
 gpg --batch --yes --local-user "$GPG_KEY_ID" -abs -o dists/trixie/Release.gpg dists/trixie/Release
 gpg --armor --export "$GPG_KEY_ID" > shellos-archive.asc
 
-cat > "$SITE/index.html" <<'EOF'
-<!doctype html>
-<meta charset="utf-8">
-<title>ShellOS apt repository</title>
-<style>body{font:16px/1.5 system-ui,sans-serif;background:#0B1416;color:#E6F4F2;max-width:46rem;margin:3rem auto;padding:0 16px}code,pre{background:#14201F;padding:.2em .4em;border-radius:4px}pre{padding:1em;overflow-x:auto}a{color:#2EC4B6}</style>
-<h1>ShellOS apt repository</h1>
-<p>Packages for <a href="https://github.com/sahil-mpatki/Shell">ShellOS</a> (Debian trixie).</p>
-<pre>curl -fsSL https://sahil-mpatki.github.io/Shell/apt/shellos-archive.asc | sudo tee /etc/apt/keyrings/shellos-archive.asc
-echo "deb [signed-by=/etc/apt/keyrings/shellos-archive.asc] https://sahil-mpatki.github.io/Shell/apt trixie main" | sudo tee /etc/apt/sources.list.d/shellos.list</pre>
-<p><a href="apt/dists/trixie/main/binary-amd64/Packages">Package index</a></p>
-EOF
+# --- website ------------------------------------------------------------------------
+# The project site (web/) at the root, with the logo generated from the same
+# script as the OS artwork, so the two never drift apart.
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cp -a "$REPO/web/." "$SITE/"
+python3 "$REPO/packages/shellos-branding/art/generate.py" "$SITE/art" >/dev/null
 log "Repository ready in $APT"
